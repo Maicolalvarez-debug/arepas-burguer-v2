@@ -1,0 +1,1 @@
+import ProductForm from '../product-form'; export const runtime='nodejs'; export default function New(){ return <ProductForm/> }

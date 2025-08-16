@@ -1,12 +1,13 @@
-# Arepas Burguer Restaurant
+# Arepas Burguer — Menú + Carrito + WhatsApp + Inventario + Reportes (Next.js + Prisma + Postgres)
 
-Sistema de pedidos con:
-- Menú público con QR por mesa
-- Admin con control de inventario y productos
-- Pedidos enviados a WhatsApp
+Listo para **GitHub + Vercel (gratis y sencillo)**.
 
-## Variables de entorno
+## Variables (Vercel → Settings → Environment Variables)
+- `DATABASE_URL` → tu Postgres (Neon o Vercel Postgres) con `sslmode=require` (y `pgbouncer=true` recomendado en Neon).
+- `ADMIN_PASSWORD` → contraseña para `/admin`.
+- `WHATSAPP_NUMBER` → `573118651391`
+- (Opcional) `BASE_URL` → dominio Vercel (para QR) `https://tu-proyecto.vercel.app`
 
-- DATABASE_URL: conexión a PostgreSQL (Neon)
-- ADMIN_PASSWORD: clave para acceder al panel admin
-- WHATSAPP_NUMBER: número de WhatsApp destino (ej: 573118651391)
+## Deploy
+- Build: `prisma generate && prisma migrate deploy && next build`
+- Runtime Node.js (API) asegurado en rutas.
