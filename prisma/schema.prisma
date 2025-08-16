@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int
+  cost        Int
+  sku         String?   @unique
+  imageUrl    String?
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  stock       Int       @default(0)
+  active      Boolean   @default(true)
+  modifiers   ProductModifier[]
+  orderItems  OrderItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Modifier {
+  id         Int                @id @default(autoincrement())
+  name       String
+  priceDelta Int                @default(0)
+  costDelta  Int                @default(0)
+  stock      Int                @default(0)
+  active     Boolean            @default(true)
+  products   ProductModifier[]
+}
+
+model ProductModifier {
+  productId  Int
+  modifierId Int
+  product    Product  @relation(fields: [productId], references: [id])
+  modifier   Modifier @relation(fields: [modifierId], references: [id])
+  @@id([productId, modifierId])
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  table      String?
+  items      OrderItem[]
+  subtotal   Int
+  total      Int
+  costTotal  Int
+  notes      String?
+  status     String      @default("pending")
+  createdAt  DateTime    @default(now())
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Int
+  cost      Int
+  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+  modifiers Json?
+}
