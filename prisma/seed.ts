@@ -37,9 +37,10 @@ async function main() {
   ];
 
   for (const m of modifiers) {
-    await prisma.modifier.create({ data: m }).catch(()=>{});
+    await prisma.modifier.upsert({ where: { name: m.name }, update: m, create: m });
   }
 
+  // Por defecto, enlazar todos los modifiers a todos los productos (luego puedes quitar/poner por producto en el admin)
   const allProducts = await prisma.product.findMany();
   const allMods = await prisma.modifier.findMany();
   for (const p of allProducts) {

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* Theme */
-:root { --bg:#0a0a0f; --card:#12121a; --ink:#e2e8f0; --muted:#94a3b8; --brand:#ff2d55; --brand-2:#ff9f0a; }
+:root { --bg:#0a0a0f; --card:#12121a; --ink:#e2e8f0; --muted:#94a3b8; --brand:#ff2d55; --brand-2:#ff9f0a; --header-h:64px; }
 html,body{min-height:100%;background:var(--bg);color:var(--ink)}
 a{color:#60a5fa}
 .container{max-width:76rem;margin:0 auto;padding:0 1rem}
@@ -19,14 +19,17 @@ th,td{text-align:left;padding:.6rem;border-bottom:1px solid rgba(255,255,255,.08
 thead th{color:var(--muted);font-weight:500}
 .header-ribbon{background:radial-gradient(1200px 240px at 20% -40%, rgba(255,45,85,.35), transparent 60%),radial-gradient(1200px 240px at 80% -40%, rgba(255,159,10,.35), transparent 60%)}
 
-/* Background watermark with logo.png if present */
-body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.04;background-image:url('/logo.png');background-repeat:repeat;background-size:240px auto;filter:grayscale(100%)}
+/* Sticky header */
+.site-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);z-index:40;background:rgba(10,10,15,.6);backdrop-filter: blur(6px); border-bottom:1px solid rgba(255,255,255,.08)}
+.page-wrap{padding-top:calc(var(--header-h) + 8px)}
 
-/* --- Modal styles --- */
+/* Background watermark with logo.png centered */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;background-image:url('/logo.png');background-repeat:no-repeat;background-position:center center;background-size:min(70vw,720px) auto;filter:grayscale(100%)}
+
+/* Modal styles */
 .modal-open{overflow:hidden}
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50}
 .modal-card{background:linear-gradient(180deg,#14141d,#0f0f14);border:1px solid rgba(255,255,255,.1);border-radius:1rem;padding:1rem;width:100%;max-width:32rem;box-shadow:0 20px 60px rgba(0,0,0,.45)}
 .qty{display:flex;align-items:center;gap:.5rem}
 .qty button{width:2rem;height:2rem;border-radius:.5rem;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.08)}
 .qty input{width:3rem;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:.3rem .4rem;border-radius:.4rem}
-/* --- End modal styles --- */

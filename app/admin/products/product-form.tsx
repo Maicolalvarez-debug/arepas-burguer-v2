@@ -1,7 +1,6 @@
 'use client';
 import useSWR from 'swr'; import { useRouter } from 'next/navigation'; import { useEffect, useMemo, useState } from 'react';
 const fetcher=(u:string)=>fetch(u).then(r=>r.json());
-
 type Modifier = { id:number; name:string; priceDelta:number; active:boolean };
 export default function ProductForm({ id }:{ id?: number }){
   const router=useRouter();

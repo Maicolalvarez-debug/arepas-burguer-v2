@@ -15,12 +15,9 @@ export default function MenuPage(){
   const [mesa, setMesa] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [active, setActive] = useState<Product|null>(null);
-
   useEffect(()=>{ const p = new URLSearchParams(window.location.search); setMesa(p.get('mesa')||''); },[]);
-
   const categories: Category[] = data?.categories || [];
   const products: Product[] = data?.products || [];
-
   const openCustomizer = (p: Product)=> setActive(p);
   const addFromCustomizer = ({ quantities }:{ quantities: Record<number, number> })=>{
     if (!active) return;
@@ -32,12 +29,10 @@ export default function MenuPage(){
     setCart(prev=> [...prev, item]);
     setActive(null);
   };
-
   const total = useMemo(()=> cart.reduce((sum, ci)=>{
     const mods = ci.chosen?.reduce((s,m)=> s + m.priceDelta * m.qty, 0) || 0;
     return sum + (ci.product.price + mods) * ci.qty;
   },0),[cart]);
-
   const message = useMemo(()=>{
     const lines = [];
     lines.push(`*AREPAS BURGUER*`);
@@ -49,7 +44,6 @@ export default function MenuPage(){
     lines.push(``); lines.push(`Total: ${fmtCOP(total)}`); lines.push(``); lines.push(`Gracias!`);
     return encodeURIComponent(lines.join("\n"));
   },[cart, mesa, total]);
-
   const sendWhatsApp = async ()=>{
     await fetch('/api/orders', {
       method: 'POST', headers: { 'Content-Type':'application/json' },
@@ -66,10 +60,8 @@ export default function MenuPage(){
     const href = `https://wa.me/${cfg.whatsapp}?text=${message}`;
     window.location.href = href;
   };
-
   if (error) return <div>Error cargando menú</div>;
   if (!data) return <div>Cargando...</div>;
-
   return (
     <div className="grid md:grid-cols-[2fr,1fr] gap-6">
       <div>

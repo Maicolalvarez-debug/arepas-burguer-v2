@@ -8,22 +8,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
-        <div className="header-ribbon">
-          <header className="border-b border-white/10">
-            <div className="container flex items-center justify-between py-4">
-              <Link href="/" className="flex items-center gap-3">
-                {/* Usa tu logo original en /public/logo.png. No pasamos onError porque los Server Components no aceptan event handlers. */}
-                <Image src="/logo.png" width={36} height={36} alt="Arepas Burguer" />
-                <span className="font-extrabold text-xl tracking-wide">Arepas Burguer</span>
-              </Link>
-              <nav className="flex gap-3 text-sm">
-                <Link className="btn" href="/menu">Menú</Link>
-                <Link className="btn" href="/admin">Admin</Link>
-              </nav>
-            </div>
-          </header>
-        </div>
-        <main className="container py-6">{children}</main>
+        <header className="site-header header-ribbon">
+          <div className="container h-full flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3">
+              <Image src="/logo.png" width={36} height={36} alt="Arepas Burguer" />
+              <span className="font-extrabold text-xl tracking-wide">Arepas Burguer</span>
+            </Link>
+            <nav className="flex gap-3 text-sm">
+              <Link className="btn" href="/menu">Menú</Link>
+              <Link className="btn" href="/admin">Admin</Link>
+            </nav>
+          </div>
+        </header>
+        <main className="page-wrap container py-6">{children}</main>
         <footer className="container py-10 text-sm text-gray-400">
           <div className="border-t border-white/10 pt-6 flex items-center justify-between">
             <div>Hecho para Arepas Burguer</div>

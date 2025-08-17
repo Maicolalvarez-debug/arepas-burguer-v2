@@ -10,7 +10,6 @@ export async function PUT(req:Request, { params }:{ params:{ id:string }}){
   const data = await req.json();
   const { modifierIds = [], ...rest } = data;
   const upd = await prisma.product.update({ where:{ id }, data: rest });
-  // Reset relations and set again
   await prisma.productModifier.deleteMany({ where:{ productId: id } });
   if (Array.isArray(modifierIds) && modifierIds.length){
     await prisma.productModifier.createMany({ data: modifierIds.map((mid:number)=> ({ productId: id, modifierId: Number(mid) })) });
