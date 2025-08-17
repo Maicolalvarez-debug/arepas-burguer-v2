@@ -29,6 +29,9 @@ model Product {
 
   modifiers   ProductModifier[]
 
+  /// 👇 **Campo inverso que faltaba** (arreglo de items de pedido que apuntan a este producto)
+  orderItems  OrderItem[]
+
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 }
@@ -62,15 +65,15 @@ model ProductModifier {
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
-  table       String?
+  id           Int         @id @default(autoincrement())
+  table        String?
   customerName String?
-  phone       String?
-  total       Int
-  status      String      @default("new")
-  items       OrderItem[]
+  phone        String?
+  total        Int
+  status       String      @default("new")
+  items        OrderItem[]
 
-  createdAt   DateTime    @default(now())
+  createdAt    DateTime    @default(now())
 }
 
 model OrderItem {
