@@ -1,1 +1,0 @@
-Sube app/globals.css y app/layout.tsx en las mismas rutas de tu repo. Mantén /public/logo.png. Haz redeploy en Vercel. Con esto vuelven los estilos y el logo se ve sin romper el diseño, también está optimizado el viewport para móvil.
