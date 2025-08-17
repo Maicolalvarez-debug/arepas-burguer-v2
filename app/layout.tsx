@@ -21,12 +21,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <main className="page-wrap container py-6">{children}</main>
-        <footer className="container py-10 text-sm text-gray-400">
-          <div className="border-t border-white/10 pt-6 flex items-center justify-between">
-            <div>Hecho para Arepas Burguer</div>
-            <div className="text-xs">© {new Date().getFullYear()}</div>
-          </div>
-        </footer>
       </body>
     </html>
   );

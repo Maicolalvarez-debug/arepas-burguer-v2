@@ -1,1 +1,1 @@
-Reemplaza este archivo /public/logo.png con tu logo real (preferible PNG fondo transparente). El header y la marca de agua lo usarán automáticamente.
+Reemplaza este /public/logo.png por tu logo real (mismo nombre). Al hacer redeploy aparecerá fijo en el header y de fondo.
