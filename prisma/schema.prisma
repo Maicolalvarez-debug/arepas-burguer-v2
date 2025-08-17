@@ -72,3 +72,9 @@ model OrderItem {
   productId Int
   quantity  Int     @default(1)
 }
+
+model Config {
+  id       Int     @id @default(1)
+  whatsapp String?
+  baseUrl  String?
+}
