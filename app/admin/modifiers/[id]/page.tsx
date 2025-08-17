@@ -1,1 +1,0 @@
-import ModForm from '../mod-form'; export const runtime='nodejs'; export default function Edit({ params }:{ params: { id: string }}){ return <ModForm id={Number(params.id)} /> }

@@ -1,1 +1,0 @@
-import ProductForm from '../product-form'; export const runtime='nodejs'; export default function Edit({ params }:{ params: { id: string }}){ return <ProductForm id={Number(params.id)} /> }
