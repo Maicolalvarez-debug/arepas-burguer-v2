@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { fmtCOP } from '@/components/Number';
 
 type Modifier = { id:number; name:string; priceDelta:number; costDelta:number; stock:number; active:boolean };
@@ -7,15 +7,13 @@ type Product = { id:number; name:string; description?:string; price:number; imag
 
 export default function Customizer({ product, onClose, onAdd }:{ product: Product; onClose:()=>void; onAdd:(payload:{ quantities: Record<number, number> })=>void }){
   const [q, setQ] = useState<Record<number, number>>({});
+  useEffect(()=>{ document.body.classList.add('modal-open'); return ()=> document.body.classList.remove('modal-open'); },[]);
   const setQty = (id:number, val:number)=> setQ(prev=> ({...prev, [id]: Math.max(0, val)}));
-
   const extras = useMemo(()=> Object.entries(q).reduce((sum,[id,qty])=>{
     const m = product.modifiers.find(x=>x.id===Number(id));
     return sum + (m? m.priceDelta * (qty as any): 0);
   }, 0), [q, product.modifiers]);
-
   const total = product.price + extras;
-
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-card" onClick={e=>e.stopPropagation()}>

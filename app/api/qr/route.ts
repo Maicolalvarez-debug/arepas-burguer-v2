@@ -1,14 +1,22 @@
 export const runtime = 'nodejs';
-import QRCode from "qrcode";
+import QRCode from 'qrcode';
+
 export async function POST(req: Request){
-  const { ids } = await req.json();
-  const base = process.env.BASE_URL || "";
-  const host = base || "";
-  const files: string[] = [];
-  for (const id of ids as string[]){
-    const url = (host || '') + `/menu?mesa=${encodeURIComponent(id)}`;
-    const dataUrl = await QRCode.toDataURL(url, { margin: 1, width: 512 });
-    files.push(dataUrl);
+  try{
+    const { ids, mesa } = await req.json();
+    // Resolve base URL
+    const baseEnv = process.env.BASE_URL;
+    let base = baseEnv && baseEnv.trim().length ? baseEnv : '';
+    if(!base){
+      const host = req.headers.get('host') || '';
+      const proto = host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
+      base = `${proto}://${host}`;
+    }
+    const list = Array.isArray(ids) ? ids : [ids];
+    const payload = list.map((id:string)=> `${base}/menu?mesa=${encodeURIComponent(id)}`);
+    const svg = await QRCode.toString(payload.join('\n'), { type: 'svg', width: 320, margin: 1 });
+    return new Response(svg, { headers: { 'Content-Type': 'image/svg+xml' } });
+  }catch(e:any){
+    return new Response(JSON.stringify({ error: e?.message || 'Error generating QR' }), { status: 500 });
   }
-  return Response.json({ files });
 }
