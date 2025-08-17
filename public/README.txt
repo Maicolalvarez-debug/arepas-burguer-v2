@@ -1,1 +1,0 @@
-Reemplaza este /public/logo.png por tu logo real (mismo nombre). Al hacer redeploy aparecerá fijo en el header y de fondo.

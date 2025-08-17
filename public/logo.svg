@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
-<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#ff2d55"/><stop offset="1" stop-color="#ff9f0a"/></linearGradient></defs>
-<circle cx="80" cy="80" r="74" fill="#0f0f14" stroke="url(#g)" stroke-width="6"/>
-<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="34" font-family="Arial Black" fill="#fff">AB</text>
-</svg>
