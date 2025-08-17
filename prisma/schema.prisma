@@ -1,0 +1,38 @@
+
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model Category { id Int @id @default(autoincrement()) name String @unique products Product[] }
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  price Int
+  cost Int
+  stock Int @default(0)
+  imageUrl String?
+  active Boolean @default(true)
+  order Int @default(0)
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  modifiers ProductModifier[]
+  orderItems OrderItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+model Modifier {
+  id Int @id @default(autoincrement())
+  name String @unique
+  priceDelta Int @default(0)
+  costDelta Int @default(0)
+  stock Int @default(0)
+  active Boolean @default(true)
+  imageUrl String?
+  products ProductModifier[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+model ProductModifier { id Int @id @default(autoincrement()) product Product @relation(fields: [productId], references: [id]) productId Int modifier Modifier @relation(fields: [modifierId], references: [id]) modifierId Int }
+model Order { id Int @id @default(autoincrement()) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt items OrderItem[] }
+model OrderItem { id Int @id @default(autoincrement()) order Order @relation(fields: [orderId], references: [id]) orderId Int product Product @relation(fields: [productId], references: [id]) productId Int quantity Int @default(1) }
+model Config { id Int @id @default(1) whatsapp String? baseUrl String? }
