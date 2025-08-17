@@ -1,10 +1,32 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+async function upsertByNameCategory(name: string) {
+  const found = await prisma.category.findFirst({ where: { name } });
+  if (found) return await prisma.category.update({ where: { id: found.id }, data: { name } });
+  return await prisma.category.create({ data: { name } });
+}
+
+async function upsertByNameModifier(data: { name: string; priceDelta: number; costDelta: number; stock: number; active?: boolean }) {
+  const found = await prisma.modifier.findFirst({ where: { name: data.name } });
+  if (found) {
+    return await prisma.modifier.update({ where: { id: found.id }, data });
+  }
+  return await prisma.modifier.create({ data });
+}
+
+async function upsertByNameProduct(data: any) {
+  const found = await prisma.product.findFirst({ where: { name: data.name } });
+  if (found) {
+    return await prisma.product.update({ where: { id: found.id }, data });
+  }
+  return await prisma.product.create({ data });
+}
+
 async function main() {
-  const catBurger = await prisma.category.upsert({ where: { id: 1 }, update: { name: "Hamburguesas" }, create: { name: "Hamburguesas" } });
-  const catArepas = await prisma.category.upsert({ where: { id: 2 }, update: { name: "Arepas" }, create: { name: "Arepas" } });
-  const catDrinks = await prisma.category.upsert({ where: { id: 3 }, update: { name: "Bebidas" }, create: { name: "Bebidas" } });
+  const catBurger = await upsertByNameCategory("Hamburguesas");
+  const catArepas = await upsertByNameCategory("Arepas");
+  const catDrinks = await upsertByNameCategory("Bebidas");
 
   const products = [
     { name: "Sencilla", price: 10000, cost: 6000, stock: 30, description: "Carne, vegetales. Sin queso.", categoryId: catBurger.id, imageUrl: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80" },
@@ -20,35 +42,31 @@ async function main() {
   ];
 
   for (const p of products) {
-    await prisma.product.upsert({
-      where: { sku: p.name },
-      update: { ...p },
-      create: { ...p, sku: p.name },
-    });
+    await upsertByNameProduct(p);
   }
 
-  const modifiers = [
-    { name: "Queso extra (doble crema)", priceDelta: 2000, costDelta: 800, stock: 100 },
-    { name: "Tocineta extra", priceDelta: 2500, costDelta: 1200, stock: 100 },
-    { name: "Huevo", priceDelta: 1500, costDelta: 600, stock: 60 },
-    { name: "Maíz tierno", priceDelta: 1000, costDelta: 400, stock: 60 },
-    { name: "Salsa BBQ", priceDelta: 500, costDelta: 200, stock: 80 },
-    { name: "Doble carne", priceDelta: 6000, costDelta: 3500, stock: 30 },
+  const modifiersData = [
+    { name: "Queso extra (doble crema)", priceDelta: 2000, costDelta: 800, stock: 100, active: true },
+    { name: "Tocineta extra", priceDelta: 2500, costDelta: 1200, stock: 100, active: true },
+    { name: "Huevo", priceDelta: 1500, costDelta: 600, stock: 60, active: true },
+    { name: "Maíz tierno", priceDelta: 1000, costDelta: 400, stock: 60, active: true },
+    { name: "Salsa BBQ", priceDelta: 500, costDelta: 200, stock: 80, active: true },
+    { name: "Doble carne", priceDelta: 6000, costDelta: 3500, stock: 30, active: true },
   ];
 
-  for (const m of modifiers) {
-    await prisma.modifier.upsert({ where: { name: m.name }, update: m, create: m });
+  for (const m of modifiersData) {
+    await upsertByNameModifier(m);
   }
 
-  // Por defecto, enlazar todos los modifiers a todos los productos (luego puedes quitar/poner por producto en el admin)
+  // Enlazar todos los modifiers a todos los productos (luego los ajustas en el admin)
   const allProducts = await prisma.product.findMany();
   const allMods = await prisma.modifier.findMany();
   for (const p of allProducts) {
     for (const m of allMods) {
       await prisma.productModifier.upsert({
         where: { productId_modifierId: { productId: p.id, modifierId: m.id } },
-        update: {},
         create: { productId: p.id, modifierId: m.id },
+        update: {},
       });
     }
   }
@@ -56,6 +74,4 @@ async function main() {
   console.log("Seed de Arepas Burguer cargado ✅");
 }
 
-main()
-  .then(async () => { await prisma.$disconnect(); })
-  .catch(async (e) => { console.error(e); await prisma.$disconnect(); process.exit(1); });
+main().then(async()=>{await prisma.$disconnect()}).catch(async(e)=>{console.error(e);await prisma.$disconnect();process.exit(1)});
