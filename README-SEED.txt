@@ -1,0 +1,1 @@
+Este paquete activa el seed automático en el deploy y agrega campo de imagen en productos. Sube también un archivo /public/logo.png para usar tu logo original (se verá en el header y como fondo sutil).

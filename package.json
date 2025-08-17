@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push --accept-data-loss && next build",
+    "build": "prisma generate && prisma db push --accept-data-loss && prisma db seed && next build",
     "start": "next start",
     "postinstall": "prisma generate"
   },
@@ -30,5 +30,8 @@
     "tailwindcss": "3.4.4",
     "ts-node": "10.9.2",
     "typescript": "5.4.5"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   }
 }

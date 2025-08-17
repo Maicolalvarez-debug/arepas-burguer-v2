@@ -75,6 +75,7 @@ export default function MenuPage(){
               {products.filter(p=>p.categoryId===cat.id && p.active).map(p=>(
                 <Card key={p.id}>
                   <div className="flex flex-col gap-2">
+                    {p.imageUrl ? <img src={p.imageUrl} alt={p.name} className="rounded-md w-full h-40 object-cover" /> : null}
                     <div className="font-semibold">{p.name}</div>
                     {p.description && <div className="text-sm text-gray-300">{p.description}</div>}
                     <div className="text-lg">{fmtCOP(p.price)}</div>
