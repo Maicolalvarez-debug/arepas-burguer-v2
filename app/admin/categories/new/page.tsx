@@ -1,0 +1,1 @@
+import CategoryForm from '../category-form'; export const runtime='nodejs'; export default function New(){ return <CategoryForm/> }

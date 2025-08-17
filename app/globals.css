@@ -1,17 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root { --bg:#0b0b0b; --card:#121212; --primary:#e11d48; }
-html, body { background: var(--bg); color: white; }
-a { color: #60a5fa; }
-.container { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
-.card { border-radius: 1rem; background: #121212; box-shadow: 0 10px 30px rgba(0,0,0,.25); padding: 1rem; }
-.btn { padding: .5rem 1rem; border-radius: .75rem; background: rgba(255,255,255,.1); transition: .2s; }
-.btn:hover { background: rgba(255,255,255,.2); }
-.btn-primary { padding: .5rem 1rem; border-radius: .75rem; background: #e11d48; transition: .2s; }
-.btn-primary:hover { background: #be123c; }
-.input { width: 100%; padding: .5rem .75rem; border-radius: .5rem; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); outline: none; }
-.label { font-size: .875rem; color: #cbd5e1; }
-table { width: 100%; }
-th, td { text-align: left; padding: .5rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+/* Theme */
+:root { --bg:#0a0a0f; --card:#12121a; --ink:#e2e8f0; --muted:#94a3b8; --brand:#ff2d55; --brand-2:#ff9f0a; }
+html,body{background:var(--bg);color:var(--ink)}
+a{color:#60a5fa}
+.container{max-width:76rem;margin:0 auto;padding:0 1rem}
+.card{border-radius:1rem;background:linear-gradient(180deg,#12121a,#0f0f14);box-shadow:0 12px 30px rgba(0,0,0,.35);padding:1rem;border:1px solid rgba(255,255,255,.06)}
+.btn{padding:.6rem 1rem;border-radius:.7rem;background:rgba(255,255,255,.08);transition:.2s;border:1px solid rgba(255,255,255,.08)}
+.btn:hover{background:rgba(255,255,255,.14)}
+.btn-primary{padding:.65rem 1.1rem;border-radius:.8rem;background:linear-gradient(90deg,var(--brand),var(--brand-2));color:#0a0a0a;font-weight:600}
+.btn-primary:hover{filter:brightness(1.05)}
+.input,textarea,select{width:100%;padding:.6rem .75rem;border-radius:.6rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);outline:none}
+.label{font-size:.85rem;color:var(--muted);margin-bottom:.25rem;display:block}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:.6rem;border-bottom:1px solid rgba(255,255,255,.08)}
+thead th{color:var(--muted);font-weight:500}
+.header-ribbon{background:radial-gradient(1200px 240px at 20% -40%, rgba(255,45,85,.35), transparent 60%),radial-gradient(1200px 240px at 80% -40%, rgba(255,159,10,.35), transparent 60%)}
