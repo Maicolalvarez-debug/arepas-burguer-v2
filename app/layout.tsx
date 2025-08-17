@@ -12,7 +12,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <header className="border-b border-white/10">
             <div className="container flex items-center justify-between py-4">
               <Link href="/" className="flex items-center gap-3">
-                <Image src="/logo.png" width={36} height={36} alt="Arepas Burguer" onError={(e:any)=>{}} />
+                {/* Usa tu logo original en /public/logo.png. No pasamos onError porque los Server Components no aceptan event handlers. */}
+                <Image src="/logo.png" width={36} height={36} alt="Arepas Burguer" />
                 <span className="font-extrabold text-xl tracking-wide">Arepas Burguer</span>
               </Link>
               <nav className="flex gap-3 text-sm">
