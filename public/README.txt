@@ -1,0 +1,1 @@
+Coloca aquí tu archivo logo.png (exactamente con ese nombre). Este archivo se usará en el header y como marca de agua del fondo.
