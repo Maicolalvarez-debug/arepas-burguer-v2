@@ -1,15 +1,18 @@
-import { NextRequest } from 'next/server'
-import { prisma } from '../../../lib/prisma'
+// app/api/categories/route.ts
+import prisma from '@/lib/prisma'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const list = await prisma.category.findMany({ orderBy: [{ order: 'asc' }, { id: 'asc' }] })
-  return Response.json(list)
+  // Orden básico por id para compatibilidad
+  const categories = await prisma.category.findMany({ orderBy: { id: 'asc' } })
+  return NextResponse.json(categories)
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const body = await req.json()
   const name = String(body.name ?? '').trim()
-  if (!name) return new Response('Nombre requerido', { status: 400 })
+  if (!name) return NextResponse.json({ error: 'name requerido' }, { status: 400 })
+
   const created = await prisma.category.create({ data: { name } })
-  return Response.json(created)
+  return NextResponse.json(created, { status: 201 })
 }

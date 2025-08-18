@@ -1,25 +1,23 @@
-import { NextRequest } from 'next/server'
-import { prisma } from '../../../lib/prisma'
+// app/api/modifiers/route.ts
+import prisma from '@/lib/prisma'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const list = await prisma.modifier.findMany({ orderBy: [{ id: 'asc' }] })
-  return Response.json(list)
+  const mods = await prisma.modifier.findMany({ orderBy: { id: 'asc' } })
+  return NextResponse.json(mods)
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const name = String(body.name ?? '').trim()
-  const priceDelta = Number.parseInt(String(body.priceDelta ?? '0'), 10)
-  const costDelta  = Number.parseInt(String(body.costDelta ?? '0'), 10)
-  const stock      = Number.parseInt(String(body.stock ?? '0'), 10)
-  const active     = body.active === false ? false : true
+export async function POST(req: Request) {
+  const b = await req.json()
+  const name = String(b.name ?? '').trim()
+  const priceDelta = Number.parseInt(String(b.priceDelta ?? ''), 10)
+  const costDelta = Number.parseInt(String(b.costDelta ?? ''), 10)
+  const stock = Number.parseInt(String(b.stock ?? ''), 10)
+  const active = b.active === false ? false : true
 
   if (!name || Number.isNaN(priceDelta) || Number.isNaN(costDelta) || Number.isNaN(stock)) {
-    return new Response('Campos requeridos inválidos', { status: 400 })
+    return NextResponse.json({ error: 'Campos requeridos inválidos' }, { status: 400 })
   }
-
-  const created = await prisma.modifier.create({
-    data: { name, priceDelta, costDelta, stock, active }
-  })
-  return Response.json(created)
+  const created = await prisma.modifier.create({ data: { name, priceDelta, costDelta, stock, active } })
+  return NextResponse.json(created, { status: 201 })
 }

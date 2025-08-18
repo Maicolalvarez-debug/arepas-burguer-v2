@@ -1,12 +1,7 @@
-import { NextRequest } from 'next/server'
-import { prisma } from '../../../../lib/prisma'
+// app/api/categories/reorder/route.ts
+import { NextResponse } from 'next/server'
 
-export async function PATCH(req: NextRequest) {
-  const { ids } = await req.json() as { ids: number[] }
-  if (!Array.isArray(ids) || !ids.length) return new Response('Bad Request', { status: 400 })
-  // write order sequentially
-  for (let i = 0; i < ids.length; i++) {
-    await prisma.category.update({ where: { id: ids[i] }, data: { order: i } })
-  }
-  return Response.json({ ok: true })
+// Compatibilidad: tu esquema estable probablemente no tiene "order".
+export async function PATCH() {
+  return NextResponse.json({ error: 'Reordenamiento no soportado en este esquema' }, { status: 501 })
 }

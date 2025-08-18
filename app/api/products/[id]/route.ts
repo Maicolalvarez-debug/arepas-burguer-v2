@@ -1,11 +1,10 @@
-import { NextRequest } from 'next/server'
-import { prisma } from '../../../../lib/prisma'
+// app/api/products/[id]/route.ts
+import prisma from '@/lib/prisma'
+import { NextResponse } from 'next/server'
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const id = Number(params.id)
   const body = await req.json()
-
-  if (!id) return new Response('Bad Request', { status: 400 })
 
   const data: any = {}
   if (body.name !== undefined) data.name = String(body.name).trim()
@@ -16,13 +15,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (body.stock !== undefined) data.stock = Number.parseInt(String(body.stock), 10)
   if (body.active !== undefined) data.active = !!body.active
 
-  const updated = await prisma.product.update({ where: { id }, data })
-  return Response.json(updated)
-}
+  if (data.price !== undefined && Number.isNaN(data.price)) return NextResponse.json({ error: 'price inválido' }, { status: 400 })
+  if (data.cost !== undefined && Number.isNaN(data.cost)) return NextResponse.json({ error: 'cost inválido' }, { status: 400 })
+  if (data.stock !== undefined && Number.isNaN(data.stock)) return NextResponse.json({ error: 'stock inválido' }, { status: 400 })
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const id = Number(params.id)
-  if (!id) return new Response('Bad Request', { status: 400 })
-  await prisma.product.delete({ where: { id } })
-  return new Response(null, { status: 204 })
+  const updated = await prisma.product.update({ where: { id }, data })
+  return NextResponse.json(updated)
 }
