@@ -13,19 +13,19 @@ model Category {
   name      String    @unique
   products  Product[]
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  @updatedAt @default(now())
 }
 
 model Product {
   id               Int                @id @default(autoincrement())
   name             String
-  price            Int                // en centavos
+  price            Int
   categoryId       Int?
   category         Category?          @relation(fields: [categoryId], references: [id])
   productModifiers ProductModifier[]
   orderItems       OrderItem[]
   createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  updatedAt        DateTime           @updatedAt @default(now())
 
   @@index([categoryId])
 }
@@ -33,11 +33,11 @@ model Product {
 model Modifier {
   id                 Int                 @id @default(autoincrement())
   name               String
-  priceDelta         Int                 @default(0) // en centavos
+  priceDelta         Int                 @default(0)
   productModifiers   ProductModifier[]
   orderItemModifiers OrderItemModifier[]
   createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  updatedAt          DateTime            @updatedAt @default(now())
 }
 
 model ProductModifier {
@@ -57,10 +57,10 @@ model ProductModifier {
 model Order {
   id        Int         @id @default(autoincrement())
   status    String      @default("pending")
-  total     Int         @default(0) // en centavos
+  total     Int         @default(0)
   items     OrderItem[]
   createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  updatedAt DateTime    @updatedAt @default(now())
 }
 
 model OrderItem {
@@ -75,7 +75,7 @@ model OrderItem {
   modifiers  OrderItemModifier[]
 
   createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  updatedAt  DateTime   @updatedAt @default(now())
 
   @@index([orderId])
   @@index([productId])
