@@ -32,7 +32,7 @@ model Product {
 
 model Modifier {
   id                 Int                 @id @default(autoincrement())
-  name               String
+  name               String              @unique   // <-- AÑADIR @unique
   priceDelta         Int                 @default(0)
   productModifiers   ProductModifier[]
   orderItemModifiers OrderItemModifier[]
