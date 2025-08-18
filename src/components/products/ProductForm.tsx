@@ -1,0 +1,6 @@
+'use client';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import NumberField from '@/components/ui/NumberField';
+import { productSchema, ProductInput } from '@/schemas/product';
+export default function ProductForm({ onSubmit, defaultValues }:{ onSubmit:(d:ProductInput)=>void|Promise<void>; defaultValues?: Partial<ProductInput>;}){ const { register, handleSubmit, setValue, watch, formState:{errors,isSubmitting}}=useForm<ProductInput>({ resolver: zodResolver(productSchema), defaultValues:{ name:'', description:'', categoryId: undefined, price:'', cost:'', stock:'', ...(defaultValues as any)},}); return (<form onSubmit={handleSubmit(onSubmit)} className="space-y-3"><input placeholder="Nombre" {...register('name')}/>{errors.name && <p className="text-red-500 text-sm">{String(errors.name.message)}</p>}<NumberField placeholder="Precio" value={watch('price') as any} onChange={(v)=>setValue('price', v as any)}/><NumberField placeholder="Costo" value={watch('cost') as any} onChange={(v)=>setValue('cost', v as any)}/><NumberField placeholder="Stock" value={watch('stock') as any} onChange={(v)=>setValue('stock', v as any)}/><button disabled={isSubmitting} type="submit">Guardar</button></form>);}
