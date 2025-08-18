@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,42 +9,37 @@ datasource db {
 
 // ---------- Catálogo ----------
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  products Product[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Product {
-  id        Int                 @id @default(autoincrement())
-  name      String
-  price     Int                 // precio base en centavos
-  categoryId Int?
-  category  Category?           @relation(fields: [categoryId], references: [id])
-  // relación muchos-a-muchos explícita con Modifier
+  id               Int                @id @default(autoincrement())
+  name             String
+  price            Int                // en centavos
+  categoryId       Int?
+  category         Category?          @relation(fields: [categoryId], references: [id])
   productModifiers ProductModifier[]
-  // items de pedidos que refieren a este producto
   orderItems       OrderItem[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   @@index([categoryId])
 }
 
 model Modifier {
-  id        Int                 @id @default(autoincrement())
-  name      String
-  priceDelta Int                @default(0) // ajuste de precio en centavos
-  // relación muchos-a-muchos explícita con Product
-  productModifiers    ProductModifier[]
-  // relación con modificadores aplicados a cada ítem del pedido
-  orderItemModifiers  OrderItemModifier[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  priceDelta         Int                 @default(0) // en centavos
+  productModifiers   ProductModifier[]
+  orderItemModifiers OrderItemModifier[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 }
 
-// tabla puente explícita Product <-> Modifier
 model ProductModifier {
   id         Int      @id @default(autoincrement())
   productId  Int
@@ -64,33 +57,39 @@ model ProductModifier {
 model Order {
   id        Int         @id @default(autoincrement())
   status    String      @default("pending")
-  total     Int         @default(0) // total en centavos; puedes recalcular en backend
+  total     Int         @default(0) // en centavos
   items     OrderItem[]
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
 
 model OrderItem {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   orderId    Int
   productId  Int
-  quantity   Int      @default(1)
-  price      Int      // precio unitario o subtotal, como prefieras; define tu regla
+  quantity   Int        @default(1)
+  price      Int
 
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product    Product  @relation(fields: [productId], references: [id])
-
-  // modificadores aplicados a este ítem del pedido
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id])
   modifiers  OrderItemModifier[]
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@index([orderId])
   @@index([productId])
 }
 
-// tabla puente: modificadores aplicados a un OrderItem concreto
 model OrderItemModifier {
   id          Int       @id @default(autoincrement())
-  or
+  orderItemId Int
+  modifierId  Int
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  modifier  Modifier  @relation(fields: [modifierId], references: [id])
+
+  @@unique([orderItemId, modifierId])
+  @@index([orderItemId])
+  @@index([modifierId])
+}
