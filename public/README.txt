@@ -1,1 +1,0 @@
-Reemplaza este logo por tu imagen real como 'logo.png'
