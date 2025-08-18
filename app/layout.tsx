@@ -8,6 +8,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }){
   return (
     <html lang="es">
       <body>
+        <header className="w-full flex items-center justify-center py-4 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur">
+          <Link href="/">
+            <div className="bg-black p-2 rounded-xl shadow-lg">
+              <Image src="/logo.png" alt="Arepas Burguer Logo" width={140} height={140} priority />
+            </div>
+          </Link>
+        </header>
+        
         <header className="site-header">
           <div className="container h-full flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">

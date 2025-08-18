@@ -27,3 +27,5 @@ body::before{ content:""; position:fixed; inset:0; pointer-events:none; z-index:
 .product-img{ width:100%; height:10rem; object-fit:cover; border-radius:.75rem }
 .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:50 }
 .modal-card{ background:linear-gradient(180deg,#141b2b,#0f1625); border:1px solid rgba(255,255,255,.12); border-radius:1rem; padding:1rem; width:100%; max-width:32rem }
+
+body { background-image: url('/bg-pattern.png'); background-repeat: repeat; background-size: 800px 800px; }
