@@ -1,90 +1,146 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// prisma/seed.ts
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
+/**
+ * Helpers idempotentes
+ */
+async function ensureCategory(name: string) {
+  const existing = await prisma.category.findUnique({ where: { name } })
+  if (existing) return existing
+  return prisma.category.create({ data: { name } })
+}
+
+async function ensureModifier(name: string, priceDelta: number) {
+  // name es @unique en el schema
+  return prisma.modifier.upsert({
+    where: { name },
+    update: { priceDelta },
+    create: { name, priceDelta },
+  })
+}
+
+type ProductInput = { name: string; price: number; categoryName: string }
+
+async function ensureProduct({ name, price, categoryName }: ProductInput) {
+  // Buscamos por nombre + categoría para evitar duplicados sin requerir @unique en Product.name
+  const category = await ensureCategory(categoryName)
+
+  const existing = await prisma.product.findFirst({
+    where: { name, categoryId: category.id },
+  })
+
+  if (existing) {
+    // Actualiza solo lo necesario (por ejemplo, precio)
+    return prisma.product.update({
+      where: { id: existing.id },
+      data: { price, categoryId: category.id },
+    })
+  }
+
+  return prisma.product.create({
+    data: { name, price, category: { connect: { id: category.id } } },
+  })
+}
+
+async function linkProductModifier(productId: number, modifierId: number) {
+  // Evita duplicados con @@unique([productId, modifierId])
+  try {
+    await prisma.productModifier.create({
+      data: { productId, modifierId },
+    })
+  } catch (e) {
+    // si ya existe, no pasa nada
+  }
+}
 
 async function main() {
-  // Categories
-  const cats = [
-    'Hamburguesas', 'Arepas', 'Perros Calientes', 'Salchipapas', 'Bebidas', 'Adicionales'
-  ];
+  // 1) Categorías base (ajusta/añade si quieres)
+  const categorias = ['Hamburguesas', 'Arepas', 'Bebidas', 'Combos']
+  await Promise.all(categorias.map((c) => ensureCategory(c)))
 
-  const catMap: Record<string, number> = {};
-  for (const name of cats) {
-    const c = await prisma.category.upsert({
-      where: { name },
-      update: {},
-      create: { name }
-    });
-    catMap[name] = c.id;
+  // 2) Modificadores (solo campos que existen: name, priceDelta)
+  const modificadores = [
+    { name: 'Queso extra (doble crema)', priceDelta: 2000 },
+    { name: 'Tocineta extra', priceDelta: 2500 },
+    { name: 'Jamón extra', priceDelta: 1500 },
+    { name: 'Piña extra', priceDelta: 1500 },
+    { name: 'Champiñones extra', priceDelta: 2500 },
+    { name: 'Salsa cheddar extra', priceDelta: 2000 },
+  ]
+  const modifierMap: Record<string, number> = {}
+  for (const m of modificadores) {
+    const mod = await ensureModifier(m.name, m.priceDelta)
+    modifierMap[m.name] = mod.id
   }
 
-  // Modifiers (Adicionales globales)
-  const mods = [
-    { name: 'Queso extra (doble crema)', priceDelta: 2000, costDelta: 800 },
-    { name: 'Tocineta', priceDelta: 3000, costDelta: 1200 },
-    { name: 'Huevo', priceDelta: 1500, costDelta: 700 },
-    { name: 'Salsa tártara', priceDelta: 1000, costDelta: 300 },
-    { name: 'Guacamole', priceDelta: 2500, costDelta: 1000 },
-  ];
-
-  const modIds: number[] = [];
-  for (const m of mods) {
-    const mm = await prisma.modifier.upsert({
-      where: { name: m.name },
-      update: { priceDelta: m.priceDelta, costDelta: m.costDelta, active: true },
-      create: { ...m, stock: 999999, active: true }
-    });
-    modIds.push(mm.id);
-  }
-
-  // Products
-  const products = [
+  // 3) Productos (usa tu lista real de 23 productos si la tienes; aquí una base con los oficiales que me has dado)
+  const productos: ProductInput[] = [
     // Hamburguesas
-    { name: 'Hamburguesa Clásica', description: 'Carne 120g, queso, lechuga, tomate, salsas', price: 15000, cost: 7000, category: 'Hamburguesas' },
-    { name: 'Hamburguesa Doble', description: 'Doble carne, doble queso, lechuga, tomate', price: 22000, cost: 11000, category: 'Hamburguesas' },
-    // Arepas
-    { name: 'Arepa Sencilla', description: 'Arepa de maíz, queso, mantequilla', price: 8000, cost: 3000, category: 'Arepas' },
-    { name: 'Arepa Rellena Pollo', description: 'Arepa con pollo desmechado y queso', price: 14000, cost: 6000, category: 'Arepas' },
-    // Perros
-    { name: 'Perro Tradicional', description: 'Salchicha, queso rallado, salsas', price: 12000, cost: 5000, category: 'Perros Calientes' },
-    // Salchipapas
-    { name: 'Salchipapas Clásica', description: 'Papas a la francesa con salchicha y salsas', price: 14000, cost: 6000, category: 'Salchipapas' },
-    // Bebidas
-    { name: 'Gaseosa 400ml', description: 'Sabor a elegir', price: 5000, cost: 2500, category: 'Bebidas' },
-  ];
+    { name: 'Sencilla', price: 12000, categoryName: 'Hamburguesas' },
+    { name: 'Clásica', price: 16000, categoryName: 'Hamburguesas' },
+    { name: 'Doble Carne', price: 21000, categoryName: 'Hamburguesas' },
+    { name: 'Hawaiana', price: 19000, categoryName: 'Hamburguesas' },
+    { name: 'Costeña (huevo)', price: 20000, categoryName: 'Hamburguesas' },
+    { name: 'Costeña (costra + plátano + suero)', price: 23000, categoryName: 'Hamburguesas' },
+    { name: 'Especial (mixta)', price: 24000, categoryName: 'Hamburguesas' },
+    { name: 'Champiñones', price: 20000, categoryName: 'Hamburguesas' },
+    { name: 'Malcriada', price: 22000, categoryName: 'Hamburguesas' },
+    { name: 'Chesseburguer', price: 18000, categoryName: 'Hamburguesas' },
 
-  for (const p of products) {
-    const prod = await prisma.product.upsert({
-      where: { name: p.name },
-      update: { price: p.price, cost: p.cost, active: true },
-      create: {
-        name: p.name,
-        description: p.description,
-        price: p.price,
-        cost: p.cost,
-        imageUrl: '/logo.png',
-        categoryId: catMap[p.category],
-        active: true
-      }
-    });
+    // Arepas (ejemplos; ajusta precios)
+    { name: 'Arepa con pollo y queso', price: 8000, categoryName: 'Arepas' },
 
-    // attach all global modifiers to each food (not beverages)
-    if (p.category !== 'Bebidas') {
-      for (const mid of modIds) {
-        await prisma.productModifier.upsert({
-          where: { productId_modifierId: { productId: prod.id, modifierId: mid } },
-          update: {},
-          create: { productId: prod.id, modifierId: mid }
-        });
-      }
+    // Bebidas (ejemplos)
+    { name: 'Coca-Cola 500ml', price: 4000, categoryName: 'Bebidas' },
+    { name: 'Postobón 400ml', price: 3500, categoryName: 'Bebidas' },
+
+    // Combos (ejemplos)
+    { name: 'Combo Clásica + Gaseosa', price: 19000, categoryName: 'Combos' },
+  ]
+
+  const productMap: Record<string, number> = {}
+  for (const p of productos) {
+    const prod = await ensureProduct(p)
+    productMap[`${p.categoryName}::${p.name}`] = prod.id
+  }
+
+  // 4) Vincular modificadores por producto (ejemplos típicos)
+  // Solo aplica para Hamburguesas (ajusta a tu gusto)
+  const hamburguesas = productos.filter((p) => p.categoryName === 'Hamburguesas')
+  for (const h of hamburguesas) {
+    const pid = productMap[`${h.categoryName}::${h.name}`]
+    // Qué modificadores tiene sentido permitir:
+    const modsParaHamburguesa = [
+      'Queso extra (doble crema)',
+      'Tocineta extra',
+      'Jamón extra',
+      'Piña extra',
+      'Champiñones extra',
+      'Salsa cheddar extra',
+    ]
+    for (const modName of modsParaHamburguesa) {
+      const mid = modifierMap[modName]
+      if (mid) await linkProductModifier(pid, mid)
     }
   }
 
-  console.log('Seed real de Arepas Burguer cargado ✅');
+  // 5) Opcional: imprime un resumen
+  const counts = await prisma.$transaction([
+    prisma.category.count(),
+    prisma.product.count(),
+    prisma.modifier.count(),
+    prisma.productModifier.count(),
+  ])
+  console.log(`Seed OK -> Categorías: ${counts[0]}, Productos: ${counts[1]}, Modificadores: ${counts[2]}, Vinculaciones: ${counts[3]}`)
 }
 
-main().catch(e => {
-  console.error(e);
-  process.exit(1);
-}).finally(async () => {
-  await prisma.$disconnect();
-});
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
