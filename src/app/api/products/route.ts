@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         price: data.price,
         cost: data.cost,
         stock: data.stock,
-        // En Prisma, las relaciones se conectan así (no con categoryId plano):
+        active: data.active ?? true,
         ...(data.categoryId
           ? { category: { connect: { id: data.categoryId } } }
           : {}),
@@ -41,10 +41,7 @@ export async function PUT(req: Request) {
         price: data.price,
         cost: data.cost,
         stock: data.stock,
-        // Reglas de relación:
-        // - Si categoryId es null explícito -> desconectar
-        // - Si viene un número -> conectar
-        // - Si no viene -> no tocar la relación
+        ...(typeof data.active === 'boolean' ? { active: data.active } : {}),
         ...(data.categoryId === null
           ? { category: { disconnect: true } }
           : data.categoryId
