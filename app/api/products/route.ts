@@ -1,4 +1,4 @@
-// src/app/api/products/route.ts
+// app/api/products/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const stock = Number(body?.stock ?? 0);
     const active = Boolean(body?.active ?? true);
 
-    // Cambia a Number(...) si price/cost no son Decimal en tu schema
+    // Cambia a Number(...) si en tu schema price/cost no son Decimal
     const price = new Prisma.Decimal(body?.price);
     const cost = new Prisma.Decimal(body?.cost);
 

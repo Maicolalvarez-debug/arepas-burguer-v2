@@ -1,5 +1,4 @@
 // app/api/modifiers/route.ts
-import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
@@ -14,13 +13,11 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Falta el nombre' }, { status: 400 });
   }
 
-  // Ajusta tipos/por defecto según tu schema
   const data = {
     name: String(name).trim(),
-    // Si en tu schema estos son Decimal, usa Prisma.Decimal:
-    priceDelta: new Prisma.Decimal(priceDelta ?? 0),
-    costDelta: new Prisma.Decimal(costDelta ?? 0),
-    // Si son Float/Int en tu schema, cambia a Number(...)
+    // En tu schema parecen ser number (no Decimal), así que usamos Number(...)
+    priceDelta: Number(priceDelta ?? 0),
+    costDelta: Number(costDelta ?? 0),
     stock: Number(stock ?? 0),
     active: active === undefined ? true : Boolean(active),
   };
