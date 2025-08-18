@@ -1,40 +1,58 @@
-// ./src/app/api/products/route.ts
+// src/app/api/products/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
-import prisma from '@/lib/prisma'; // ajusta la ruta si tu cliente Prisma está en otro sitio
+import { prisma } from '@/lib/prisma';
+
+// Utilidad simple de validación
+function isEmpty(value: unknown) {
+  return value === undefined || value === null || String(value).trim() === '';
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Asegúrate que el front envía categoryId (requerido por tu schema)
-    const data = {
-      name: String(body.name ?? '').trim(),
-      description: String(body.description ?? ''),
-      // Si price/cost son Decimal en Prisma, usa Prisma.Decimal
-      price: new Prisma.Decimal(body.price),
-      cost: new Prisma.Decimal(body.cost),
-      stock: Number(body.stock ?? 0),
-      active: Boolean(body.active ?? true),
-      // IMPORTANTE: debe existir en el body
-      categoryId: body.categoryId, // string o number según tu schema
-    } satisfies Prisma.ProductUncheckedCreateInput;
+    // Asegura tipos consistentes
+    const name = String(body?.name ?? '').trim();
+    const description = String(body?.description ?? '');
+    const stock = Number(body?.stock ?? 0);
+    const active = Boolean(body?.active ?? true);
 
-    // Validación mínima para no romper si falta la categoría
-    if (data.categoryId === undefined || data.categoryId === null || data.name === '') {
+    // Si tu schema usa Decimal:
+    const price = new Prisma.Decimal(body?.price);
+    const cost = new Prisma.Decimal(body?.cost);
+
+    // Si categoryId es Int en el schema, convierte:
+    // const categoryId = Number(body?.categoryId);
+    // Si es String (cuidar UUID/cuid):
+    const categoryId = body?.categoryId;
+
+    // Validación mínima
+    if (isEmpty(name) || isEmpty(categoryId)) {
       return NextResponse.json(
-        { error: 'Faltan campos obligatorios: categoryId y name.' },
+        { error: 'Faltan campos obligatorios: name y categoryId.' },
         { status: 400 }
       );
     }
 
     const created = await prisma.product.create({
-      data,
+      data: {
+        name,
+        description,
+        price,
+        cost,
+        stock,
+        active,
+        categoryId,
+      }, // satisfies Prisma.ProductUncheckedCreateInput
     });
 
     return NextResponse.json(created, { status: 201 });
   } catch (err: any) {
     console.error(err);
-    return NextResponse.json({ error: err?.message ?? 'Error interno' }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message ?? 'Error interno del servidor' },
+      { status: 500 }
+    );
   }
 }
