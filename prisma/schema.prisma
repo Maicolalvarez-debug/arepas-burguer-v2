@@ -9,48 +9,88 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ---------- Catálogo ----------
 model Category {
   id       Int       @id @default(autoincrement())
   name     String    @unique
   products Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id        Int                 @id @default(autoincrement())
+  name      String
+  price     Int                 // precio base en centavos
+  categoryId Int?
+  category  Category?           @relation(fields: [categoryId], references: [id])
+  // relación muchos-a-muchos explícita con Modifier
+  productModifiers ProductModifier[]
+  // items de pedidos que refieren a este producto
+  orderItems       OrderItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
 }
 
 model Modifier {
-  id         Int     @id @default(autoincrement())
-  name       String  @unique
-  priceDelta Int     @default(0)
-  costDelta  Int     @default(0)
-  stock      Int     @default(999999)
-  active     Boolean @default(true)
-  products   ProductModifier[]
+  id        Int                 @id @default(autoincrement())
+  name      String
+  priceDelta Int                @default(0) // ajuste de precio en centavos
+  // relación muchos-a-muchos explícita con Product
+  productModifiers    ProductModifier[]
+  // relación con modificadores aplicados a cada ítem del pedido
+  orderItemModifiers  OrderItemModifier[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
+// tabla puente explícita Product <-> Modifier
 model ProductModifier {
   id         Int      @id @default(autoincrement())
   productId  Int
   modifierId Int
-  product    Product  @relation(fields: [productId], references: [id])
-  modifier   Modifier @relation(fields: [modifierId], references: [id])
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  modifier Modifier @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
   @@unique([productId, modifierId])
+  @@index([productId])
+  @@index([modifierId])
 }
 
+// ---------- Pedidos ----------
 model Order {
   id        Int         @id @default(autoincrement())
-  table     String?
-  phone     String?
-  total     Int         @default(0)
-  createdAt DateTime    @default(now())
+  status    String      @default("pending")
+  total     Int         @default(0) // total en centavos; puedes recalcular en backend
   items     OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model OrderItem {
-  id        Int      @id @default(autoincrement())
-  orderId   Int
-  productId Int
-  qty       Int
-  price     Int
-  product   Product  @relation(fields: [productId], references: [id])
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId Int
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  productId  Int
+  quantity   Int      @default(1)
+  price      Int      // precio unitario o subtotal, como prefieras; define tu regla
 
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+
+  // modificadores aplicados a este ítem del pedido
+  modifiers  OrderItemModifier[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
 }
+
+// tabla puente: modificadores aplicados a un OrderItem concreto
+model OrderItemModifier {
+  id          Int       @id @default(autoincrement())
+  or
