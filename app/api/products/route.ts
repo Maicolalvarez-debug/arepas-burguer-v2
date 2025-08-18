@@ -1,6 +1,5 @@
 // app/api/products/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 function isEmpty(value: unknown) {
@@ -21,18 +20,18 @@ export async function POST(req: NextRequest) {
     const name = String(body?.name ?? '').trim();
     const description = String(body?.description ?? '');
     const stock = Number(body?.stock ?? 0);
-    const active = Boolean(body?.active ?? true);
+    const active = body?.active === undefined ? true : Boolean(body?.active);
 
-    // Cambia a Number(...) si en tu schema price/cost no son Decimal
-    const price = new Prisma.Decimal(body?.price);
-    const cost = new Prisma.Decimal(body?.cost);
+    // En tu schema price y cost son number -> usar Number(...)
+    const price = Number(body?.price);
+    const cost = Number(body?.cost);
 
     // Ajusta tipo según tu schema (Number(...) si es Int)
-    const categoryId = body?.categoryId;
+    const categoryId = Number(body?.categoryId ?? NaN);
 
-    if (isEmpty(name) || isEmpty(categoryId)) {
+    if (isEmpty(name) || Number.isNaN(categoryId)) {
       return NextResponse.json(
-        { error: 'Faltan campos obligatorios: name y categoryId.' },
+        { error: 'Faltan campos obligatorios válidos: name y categoryId.' },
         { status: 400 }
       );
     }
