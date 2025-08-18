@@ -2,9 +2,6 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
-/**
- * Helpers idempotentes
- */
 async function ensureCategory(name: string) {
   const existing = await prisma.category.findUnique({ where: { name } })
   if (existing) return existing
@@ -12,7 +9,6 @@ async function ensureCategory(name: string) {
 }
 
 async function ensureModifier(name: string, priceDelta: number) {
-  // name es @unique en el schema
   return prisma.modifier.upsert({
     where: { name },
     update: { priceDelta },
@@ -23,7 +19,6 @@ async function ensureModifier(name: string, priceDelta: number) {
 type ProductInput = { name: string; price: number; categoryName: string }
 
 async function ensureProduct({ name, price, categoryName }: ProductInput) {
-  // Buscamos por nombre + categoría para evitar duplicados sin requerir @unique en Product.name
   const category = await ensureCategory(categoryName)
 
   const existing = await prisma.product.findFirst({
@@ -31,7 +26,6 @@ async function ensureProduct({ name, price, categoryName }: ProductInput) {
   })
 
   if (existing) {
-    // Actualiza solo lo necesario (por ejemplo, precio)
     return prisma.product.update({
       where: { id: existing.id },
       data: { price, categoryId: category.id },
@@ -44,22 +38,17 @@ async function ensureProduct({ name, price, categoryName }: ProductInput) {
 }
 
 async function linkProductModifier(productId: number, modifierId: number) {
-  // Evita duplicados con @@unique([productId, modifierId])
   try {
-    await prisma.productModifier.create({
-      data: { productId, modifierId },
-    })
+    await prisma.productModifier.create({ data: { productId, modifierId } })
   } catch (e) {
-    // si ya existe, no pasa nada
+    // ignore duplicates (unique constraint)
   }
 }
 
 async function main() {
-  // 1) Categorías base (ajusta/añade si quieres)
   const categorias = ['Hamburguesas', 'Arepas', 'Bebidas', 'Combos']
   await Promise.all(categorias.map((c) => ensureCategory(c)))
 
-  // 2) Modificadores (solo campos que existen: name, priceDelta)
   const modificadores = [
     { name: 'Queso extra (doble crema)', priceDelta: 2000 },
     { name: 'Tocineta extra', priceDelta: 2500 },
@@ -74,9 +63,7 @@ async function main() {
     modifierMap[m.name] = mod.id
   }
 
-  // 3) Productos (usa tu lista real de 23 productos si la tienes; aquí una base con los oficiales que me has dado)
   const productos: ProductInput[] = [
-    // Hamburguesas
     { name: 'Sencilla', price: 12000, categoryName: 'Hamburguesas' },
     { name: 'Clásica', price: 16000, categoryName: 'Hamburguesas' },
     { name: 'Doble Carne', price: 21000, categoryName: 'Hamburguesas' },
@@ -88,14 +75,11 @@ async function main() {
     { name: 'Malcriada', price: 22000, categoryName: 'Hamburguesas' },
     { name: 'Chesseburguer', price: 18000, categoryName: 'Hamburguesas' },
 
-    // Arepas (ejemplos; ajusta precios)
     { name: 'Arepa con pollo y queso', price: 8000, categoryName: 'Arepas' },
 
-    // Bebidas (ejemplos)
     { name: 'Coca-Cola 500ml', price: 4000, categoryName: 'Bebidas' },
     { name: 'Postobón 400ml', price: 3500, categoryName: 'Bebidas' },
 
-    // Combos (ejemplos)
     { name: 'Combo Clásica + Gaseosa', price: 19000, categoryName: 'Combos' },
   ]
 
@@ -105,12 +89,9 @@ async function main() {
     productMap[`${p.categoryName}::${p.name}`] = prod.id
   }
 
-  // 4) Vincular modificadores por producto (ejemplos típicos)
-  // Solo aplica para Hamburguesas (ajusta a tu gusto)
   const hamburguesas = productos.filter((p) => p.categoryName === 'Hamburguesas')
   for (const h of hamburguesas) {
     const pid = productMap[`${h.categoryName}::${h.name}`]
-    // Qué modificadores tiene sentido permitir:
     const modsParaHamburguesa = [
       'Queso extra (doble crema)',
       'Tocineta extra',
@@ -125,7 +106,6 @@ async function main() {
     }
   }
 
-  // 5) Opcional: imprime un resumen
   const counts = await prisma.$transaction([
     prisma.category.count(),
     prisma.product.count(),
@@ -136,11 +116,5 @@ async function main() {
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+  .then(async () => { await prisma.$disconnect() })
+  .catch(async (e) => { console.error(e); await prisma.$disconnect(); process.exit(1) })
