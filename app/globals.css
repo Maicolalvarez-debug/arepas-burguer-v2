@@ -1,0 +1,80 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Brand: Arepas Burguer (dark + burgundy) ---- */
+:root{
+  --header-h:64px;
+  --bg:#0b0b0d;
+  --bg-soft:#111114;
+  --card1:#15161a;
+  --card2:#0e0f12;
+  --text:#f2f3f5;
+  --muted:#b8bcc4;
+  --burgundy1:#b3131b;
+  --burgundy2:#7f0f13;
+}
+
+html,body{ min-height:100%; background:var(--bg); color:var(--text) }
+.container{ max-width:1200px; margin:0 auto; padding:0 1rem }
+
+.card{
+  border-radius:1rem;
+  background:linear-gradient(180deg,var(--card1),var(--card2));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  padding:1rem;
+}
+
+.btn{ @apply inline-flex items-center justify-center px-3 py-2 rounded-lg; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.06); color:var(--text); transition:all .2s; }
+.btn:hover{ background:rgba(255,255,255,.10) }
+.btn-danger{ border-color:rgba(255,0,0,.25); color:#ffd5d5; background:rgba(179,19,27,.15) }
+.btn-primary{ background:linear-gradient(90deg,var(--burgundy1),var(--burgundy2)); color:#fff; font-weight:700; border:none; }
+.btn-primary:hover{ filter:brightness(1.08) }
+
+.input, textarea, select{
+  width:100%; padding:.65rem .8rem; background:var(--bg-soft);
+  border-radius:.75rem; border:1px solid rgba(255,255,255,.12); outline:none; color:var(--text)
+}
+.label{ font-size:.85rem; color:var(--muted); margin-bottom:.25rem; display:block }
+
+.site-header{
+  position:fixed; inset:0 0 auto 0; height:var(--header-h);
+  backdrop-filter: blur(12px);
+  background:rgba(11,11,13,.66);
+  border-bottom:1px solid rgba(255,255,255,.08)
+}
+.page-wrap{ padding-top:calc(var(--header-h) + 8px) }
+
+/* Sticky brand bars */
+.bar-sticky{
+  backdrop-filter: blur(12px);
+  background:linear-gradient(90deg, rgba(179,19,27,.92), rgba(127,15,19,.92));
+  color:#fff;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.bar-bottom{
+  backdrop-filter: blur(10px);
+  background:linear-gradient(90deg, rgba(179,19,27,.95), rgba(127,15,19,.95));
+  color:#fff;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+
+/* Watermark opcional */
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:url('/logo.png'); background-repeat:no-repeat; background-position:center;
+  background-size:min(70vw, 680px) auto; opacity:.035; filter:grayscale(100%);
+}
+.page-wrap,.site-header{ position:relative; z-index:1 }
+
+.grid-menu{ display:grid; gap:1rem; grid-template-columns:1fr }
+@media (min-width:640px){ .grid-menu{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
+@media (min-width:1024px){ .grid-menu{ grid-template-columns:repeat(3,minmax(0,1fr)) } }
+.product-img{ width:100%; height:10rem; object-fit:cover; border-radius:.75rem }
+
+.modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:50 }
+.modal-card{ background:linear-gradient(180deg,var(--card1),var(--card2)); border:1px solid rgba(255,255,255,.10); border-radius:1rem; padding:1rem; width:100%; max-width:32rem }
+
+.opacity-80{ opacity:.8 }
