@@ -1,1 +1,0 @@
-Added admin login with password via ADMIN_PASSWORD env, middleware protection, QR domain fixed, env mapping for WhatsApp.
