@@ -1,3 +1,0 @@
-Patched files:
-app/admin/modifiers/page.tsx
-app/admin/products/product-form.tsx
