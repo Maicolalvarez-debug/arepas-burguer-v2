@@ -63,3 +63,18 @@ model ProductModifier {
 
   @@id([productId, modifierId])
 }
+
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  tableCode String?
+  gross     Float    @default(0)
+  discount  Float    @default(0)
+  net       Float    @default(0)
+  cost      Float    @default(0)
+  profit    Float    @default(0)
+  printed   Boolean  @default(false)
+
+  @@index([createdAt])
+}
