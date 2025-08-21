@@ -1,25 +1,66 @@
-
-import { NextRequest, NextResponse } from 'next/server';
+// app/api/reports/route.ts
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-function startOfDay(d: Date){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
-function endOfDay(d: Date){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
-function fmt(d: Date){ return d.toISOString().slice(0,10); }
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const groupBy = (searchParams.get('groupBy') || 'day') as 'day'|'week'|'month';
-  const fromStr = searchParams.get('from'); const toStr = searchParams.get('to');
-  const today = new Date(); let from = fromStr ? new Date(fromStr) : new Date(today.getFullYear(), today.getMonth(), 1); let to = toStr ? new Date(toStr) : today;
-  const orders = await prisma.order.findMany({ where: { createdAt: { gte: startOfDay(from), lte: endOfDay(to) } }, orderBy: { createdAt: 'asc' } });
-  function labelFor(d: Date){
-    const y = d.getFullYear(); const m = d.getMonth()+1;
-    if(groupBy==='month') return `${y}-${String(m).padStart(2,'0')}`;
-    if(groupBy==='week'){ const dt = new Date(d.getTime()); const dayNum=(dt.getDay()+6)%7; dt.setDate(dt.getDate()-dayNum+3); const firstThursday=new Date(dt.getFullYear(),0,4); const week=1+Math.round(((dt.getTime()-firstThursday.getTime())/86400000-3+((firstThursday.getDay()+6)%7))/7); return `${dt.getFullYear()}-W${String(week).padStart(2,'0')}`; }
-    return fmt(d);
+
+function startOfDay(d: Date) { const x = new Date(d); x.setUTCHours(0,0,0,0); return x; }
+function endOfDay(d: Date)   { const x = new Date(d); x.setUTCHours(23,59,59,999); return x; }
+
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const searchParams = url.searchParams;
+    const fromStr = searchParams.get('from');
+    const toStr = searchParams.get('to');
+    const groupBy = (searchParams.get('groupBy') || 'day') as 'day' | 'month';
+
+    const today = new Date();
+    let from = fromStr ? new Date(fromStr) : new Date(today.getFullYear(), today.getMonth(), 1);
+    let to   = toStr   ? new Date(toStr)   : today;
+
+    const where: any = {};
+    where.createdAt = { gte: startOfDay(from), lte: endOfDay(to) };
+
+    const orders = await prisma.order.findMany({
+      where,
+      orderBy: { id: 'asc' }, // evitar createdAt por tipos
+    });
+
+    function labelFor(d: Date) {
+      const y = d.getFullYear(); const m = d.getMonth() + 1; const day = d.getDate();
+      return groupBy === 'month'
+        ? `${y}-${String(m).padStart(2,'0')}`
+        : `${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    }
+
+    const buckets = new Map<string, { orders: number; gross: number; discount: number; net: number; cost: number; profit: number }>();
+
+    for (const o of orders) {
+      const anyO = o as any;
+      const d = anyO.createdAt ? new Date(anyO.createdAt) : null;
+      const key = d ? labelFor(d) : 'sin-fecha';
+
+      const gross = Number(anyO.gross ?? 0);
+      const discount = Number(anyO.discount ?? 0);
+      const net = Number(anyO.net ?? (gross - discount));
+      const cost = Number(anyO.cost ?? 0);
+      const profit = Number(anyO.profit ?? (net - cost));
+
+      const prev = buckets.get(key) || { orders: 0, gross: 0, discount: 0, net: 0, cost: 0, profit: 0 };
+      prev.orders += 1;
+      prev.gross += gross;
+      prev.discount += discount;
+      prev.net += net;
+      prev.cost += cost;
+      prev.profit += profit;
+      buckets.set(key, prev);
+    }
+
+    const data = Array.from(buckets.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([period, v]) => ({ period, ...v }));
+
+    return NextResponse.json({ from: startOfDay(from).toISOString(), to: endOfDay(to).toISOString(), groupBy, data });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err?.message || 'Error generando reporte' }, { status: 500 });
   }
-  const bucket = new Map<string,{gross:number,net:number,cost:number}>();
-  for(const o of orders){ const k=labelFor(o.createdAt); const b=bucket.get(k)||{gross:0,net:0,cost:0}; b.gross+=o.gross; b.net+=o.net; b.cost+=o.cost; bucket.set(k,b); }
-  const labels = Array.from(bucket.keys()).sort();
-  const series = labels.map(k=>{ const b=bucket.get(k)!; return { label:k, gross:b.gross, net:b.net, cost:b.cost, profit:b.net-b.cost }; });
-  const totals = series.reduce((a,c)=>({ gross:a.gross+c.gross, net:a.net+c.net, cost:a.cost+c.cost, profit:a.profit+c.profit }), {gross:0,net:0,cost:0,profit:0});
-  return NextResponse.json({ from: fmt(from), to: fmt(to), groupBy, totals, series });
 }
