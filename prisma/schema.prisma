@@ -1,0 +1,153 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  active      Boolean   @default(true)
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+
+  @@index([active])
+  @@index([sortOrder])
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  price       Float      @default(0)
+  cost        Float      @default(0)
+  stock       Int        @default(0)
+  active      Boolean    @default(true)
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  categoryId  Int?
+  category    Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  modifiers   ProductModifier[]
+  orderItems  OrderItem[]
+
+  @@index([active])
+  @@index([categoryId])
+  @@index([sortOrder])
+}
+
+model Modifier {
+  id         Int       @id @default(autoincrement())
+  name       String
+  priceDelta Float     @default(0)
+  costDelta  Float     @default(0)
+  stock      Int       @default(0)
+  active     Boolean   @default(true)
+  sortOrder  Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  products   ProductModifier[]
+  itemMods   OrderItemModifier[]
+
+  @@index([active])
+  @@index([sortOrder])
+}
+
+model ProductModifier {
+  productId  Int
+  modifierId Int
+
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  modifier   Modifier @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
+  @@id([productId, modifierId])
+}
+
+model Order {
+  id         Int       @id @default(autoincrement())
+  tableCode  String?
+  gross      Float     @default(0)
+  discount   Float     @default(0)
+  net        Float     @default(0)
+  cost       Float     @default(0)
+  printed    Boolean   @default(false)
+  status     String    @default("pending")
+  channel    String?
+  externalId String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  items      OrderItem[]
+
+  @@index([createdAt])
+  @@index([status, createdAt])
+}
+
+model OrderItem {
+  id         Int       @id @default(autoincrement())
+  orderId    Int
+  productId  Int?
+  name       String
+  qty        Int       @default(1)
+  unitPrice  Float     @default(0)
+  unitCost   Float     @default(0)
+  lineGross  Float     @default(0)
+  lineCost   Float     @default(0)
+  lineNet    Float     @default(0)
+
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  modifiers  OrderItemModifier[]
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderItemModifier {
+  id           Int       @id @default(autoincrement())
+  orderItemId  Int
+  modifierId   Int
+  modifierName String?
+  quantity     Int       @default(1)
+  priceDelta   Float     @default(0)
+  costDelta    Float     @default(0)
+
+  orderItem    OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  modifier     Modifier  @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
+  @@index([orderItemId])
+  @@index([modifierId])
+}
+
+model DailyPromo {
+  id          Int       @id @default(autoincrement())
+  active      Boolean   @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  title       String?
+  description String?
+  image       String?
+  imageUrl    String?
+  price       Float     @default(0)
+  cost        Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([active])
+  @@index([startDate])
+  @@index([endDate])
+}
