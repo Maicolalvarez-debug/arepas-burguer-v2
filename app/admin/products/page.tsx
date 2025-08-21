@@ -2,14 +2,18 @@
 import useSWR from 'swr';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
+const fetcher=(u:string)=>fetch(u).then(r=>r.json());
 
+export default function AdminProducts(){
+  const [q,setQ]=useState('');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const { data: cats }=useSWR('/api/categories', fetcher);
 
   const move = async (index:number, dir:'up'|'down')=>{
     const arr = [ ...((data as any[])||[]) ];
     const to = dir==='up' ? index-1 : index+1;
     if (index<0 || to<0 || to>=arr.length) return;
     const t = arr[index]; arr[index] = arr[to]; arr[to] = t;
-    // Optimistic
     try { (mutate as any)(arr, { revalidate: false }); } catch { (mutate as any)(); }
     try {
       await fetch('/api/products/reorder', {
@@ -21,12 +25,7 @@ import { useState, useMemo } from 'react';
       (mutate as any)();
     }
   };
-const fetcher=(u:string)=>fetch(u).then(r=>r.json());
 
-export default function AdminProducts(){
-  const [q,setQ]=useState('');
-  const [categoryId, setCategoryId] = useState<string>('');
-  const { data: cats }=useSWR('/api/categories', fetcher);
   const { data: items, mutate }=useSWR(`/api/products?q=${encodeURIComponent(q)}&categoryId=${categoryId}`, fetcher);
 
   const del = async(id:number)=>{

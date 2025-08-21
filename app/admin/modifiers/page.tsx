@@ -2,14 +2,16 @@
 'use client';
 import useSWR from 'swr';
 import { useState } from 'react';
+const fetcher=(u:string)=>fetch(u).then(r=>r.json());
 
+export default function Modifiers(){
+  const { data, mutate }=useSWR('/api/modifiers', fetcher);
 
   const move = async (index:number, dir:'up'|'down')=>{
     const arr = [ ...((data as any[])||[]) ];
     const to = dir==='up' ? index-1 : index+1;
     if (index<0 || to<0 || to>=arr.length) return;
     const t = arr[index]; arr[index] = arr[to]; arr[to] = t;
-    // Optimistic
     try { (mutate as any)(arr, { revalidate: false }); } catch { (mutate as any)(); }
     try {
       await fetch('/api/modifiers/reorder', {
@@ -21,10 +23,7 @@ import { useState } from 'react';
       (mutate as any)();
     }
   };
-const fetcher=(u:string)=>fetch(u).then(r=>r.json());
 
-export default function Modifiers(){
-  const { data, mutate }=useSWR('/api/modifiers', fetcher);
   const [f,setF]=useState<any>({ name:'', priceDelta:0, costDelta:0, stock:0, active:true });
   const [editingId,setEditingId]=useState<number|null>(null);
   const [edit,setEdit]=useState<any>({});
