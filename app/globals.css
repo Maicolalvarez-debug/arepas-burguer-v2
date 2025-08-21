@@ -83,3 +83,17 @@ body::before{
 input, select, textarea { color: #e5e7eb !important; }
 input::placeholder, textarea::placeholder { color: #9ca3af !important; opacity: 1 !important; }
 label { color: #e5e7eb; }
+
+/* Dark inputs */
+input, select, textarea {
+  background-color: #111827 !important; /* gray-900 */
+  border: 1px solid #374151 !important;  /* gray-700 */
+  color: #e5e7eb !important;             /* gray-200 */
+  border-radius: 0.5rem !important;      /* rounded-lg */
+  padding: .5rem .75rem !important;
+}
+input::placeholder, textarea::placeholder {
+  color: #9ca3af !important;             /* gray-400 */
+  opacity: 1 !important;
+}
+label { color: #e5e7eb !important; }

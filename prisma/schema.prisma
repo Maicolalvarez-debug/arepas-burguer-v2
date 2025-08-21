@@ -14,9 +14,9 @@ model Category {
   active      Boolean   @default(true)
   description String?
   image       String?
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  sortOrder   Int       @default(0) @ignore
+  createdAt   DateTime  @default(now()) @ignore
+  updatedAt   DateTime  @updatedAt @ignore
 
   products    Product[]
 
@@ -33,9 +33,9 @@ model Product {
   cost        Float      @default(0)
   stock       Int        @default(0)
   active      Boolean    @default(true)
-  sortOrder   Int        @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  sortOrder   Int        @default(0) @ignore
+  createdAt   DateTime   @default(now()) @ignore
+  updatedAt   DateTime   @updatedAt @ignore
 
   categoryId  Int?
   category    Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
@@ -55,9 +55,9 @@ model Modifier {
   costDelta  Float     @default(0)
   stock      Int       @default(0)
   active     Boolean   @default(true)
-  sortOrder  Int       @default(0)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  sortOrder  Int       @default(0) @ignore
+  createdAt  DateTime  @default(now()) @ignore
+  updatedAt  DateTime  @updatedAt @ignore
 
   products   ProductModifier[]
   itemMods   OrderItemModifier[]
@@ -87,8 +87,8 @@ model Order {
   status     String    @default("pending")
   channel    String?
   externalId String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime  @default(now()) @ignore
+  updatedAt  DateTime  @updatedAt @ignore
 
   items      OrderItem[]
 
@@ -144,8 +144,8 @@ model DailyPromo {
   imageUrl    String?
   price       Float     @default(0)
   cost        Float     @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now()) @ignore
+  updatedAt   DateTime  @updatedAt @ignore
 
   @@index([active])
   @@index([startDate])
