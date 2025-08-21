@@ -10,6 +10,7 @@ export default function AdminHome(){
     <Link className="card" href="/admin/reports">Informes</Link>
       <Link className="card" href="/admin/receipts">Recibos</Link>
       <Link className="card" href="/admin/promo">Promo del día</Link>
+          <Link className="card" href="/admin/orders">Órdenes</Link>
     </div>
   </div>;
 }
