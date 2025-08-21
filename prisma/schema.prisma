@@ -118,3 +118,20 @@ model OrderItemModifier {
 
   @@id([orderItemId, modifierId])
 }
+
+
+model DailyPromo {
+  id          Int       @id @default(autoincrement())
+  active      Boolean   @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  title       String?
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([active])
+  @@index([startDate])
+  @@index([endDate])
+}
