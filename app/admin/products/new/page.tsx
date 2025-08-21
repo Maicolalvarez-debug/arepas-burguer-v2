@@ -40,8 +40,8 @@ export default function NewProductoPage() {
         body: JSON.stringify({
           name,
           price: Number(price)
-      
-          cost: Number(cost),
+      ,
+cost: Number(cost),
           stock: Number(stock),
           active,
           categoryId: categoryId === '' ? null : Number(categoryId),
