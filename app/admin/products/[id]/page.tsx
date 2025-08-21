@@ -1,3 +1,4 @@
+export const revalidate = 0;
 
 // app/admin/products/[id]/page.tsx
 'use client';

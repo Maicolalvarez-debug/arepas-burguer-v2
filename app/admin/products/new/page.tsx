@@ -1,3 +1,4 @@
+export const revalidate = 0;
 
 // app/admin/products/new/page.tsx
 'use client';
@@ -34,12 +35,13 @@ export default function NewProductoPage() {
     e.preventDefault();
     setMsg(null); setBusy(true);
     try {
-      const res = await fetch('/api/products', {
+      const res = await fetch('/api/products', { cache: 'no-store' }, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
-          price: Number(price),
+          price: Number(price)
+      try { router.refresh(); } catch {},
           cost: Number(cost),
           stock: Number(stock),
           active,

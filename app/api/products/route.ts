@@ -1,6 +1,7 @@
 
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 
 export async function GET() {
