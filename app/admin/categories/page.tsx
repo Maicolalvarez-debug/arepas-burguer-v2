@@ -8,7 +8,6 @@ export const dynamic = 'force-dynamic';
 export default async function Page() {
   const data = await prisma.category.findMany({
     orderBy: [
-      { position: 'asc' },
       { name: 'asc' },
     ],
   });

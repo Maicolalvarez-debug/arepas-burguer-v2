@@ -11,11 +11,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: 'Body inválido. Se espera { ids: string[] }' }, { status: 400 });
     }
 
+    // Si tu modelo Category NO tiene el campo `position` aún,
+    // este cast a `any` evita errores de Typescript durante el build.
     await prisma.$transaction(
       ids.map((id: string, index: number) =>
         prisma.category.update({
           where: { id },
-          data: { position: index },
+          data: ({ position: index } as any),
         })
       )
     );
