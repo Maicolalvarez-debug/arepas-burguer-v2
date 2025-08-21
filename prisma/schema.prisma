@@ -69,8 +69,7 @@ model ProductModifier {
 }
 
 
-\1
-  status    String   @default(\"pending\")
+  status    String   @default("pending")
   channel   String?
   externalId String?
 
