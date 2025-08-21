@@ -34,7 +34,7 @@ export default function NewProductoPage() {
     e.preventDefault();
     setMsg(null); setBusy(true);
     try {
-      const res = await fetch('/api/products', { cache: 'no-store' }, {
+      const res = await fetch('/api/products', {  cache: 'no-store' ,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
