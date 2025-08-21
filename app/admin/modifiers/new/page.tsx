@@ -49,15 +49,15 @@ export default function NewModificadorPage() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="block text-sm mb-1">priceDelta</label>
+            <label className="block text-sm mb-1">Precio</label>
             <input type="number" step="0.01" value={priceDelta} onChange={e=>setPriceDelta(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
           </div>
           <div>
-            <label className="block text-sm mb-1">costDelta</label>
+            <label className="block text-sm mb-1">Costo</label>
             <input type="number" step="0.01" value={costDelta} onChange={e=>setCostDelta(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
           </div>
           <div>
-            <label className="block text-sm mb-1">stock</label>
+            <label className="block text-sm mb-1">Stock</label>
             <input type="number" value={stock} onChange={e=>setStock(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
           </div>
           <div className="flex items-center gap-2 mt-6">
