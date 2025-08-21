@@ -1,10 +1,10 @@
 
-// app/admin/products/new/page.tsx
+// app/admin/categories/new/page.tsx
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function NewProductoPage() {
+export default function NewCategoríaPage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [msg, setMsg] = useState<string | null>(null);
@@ -14,14 +14,14 @@ export default function NewProductoPage() {
     e.preventDefault();
     setMsg(null); setBusy(true);
     try {
-      const res = await fetch('/api/products', {
+      const res = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
       const json = await res.json();
       if (!res.ok || !json?.ok) throw new Error(json?.error || 'No se pudo crear');
-      router.push('/admin/products');
+      router.push('/admin/categories');
     } catch (err: any) {
       setMsg(err?.message || 'Error');
     } finally {
@@ -31,7 +31,7 @@ export default function NewProductoPage() {
 
   return (
     <div className="p-4 max-w-md space-y-4">
-      <h1 className="text-xl font-semibold">Nuevo Producto</h1>
+      <h1 className="text-xl font-semibold">Nuevo Categoría</h1>
       <form onSubmit={submit} className="space-y-3">
         <div>
           <label className="block text-sm mb-1">Nombre</label>

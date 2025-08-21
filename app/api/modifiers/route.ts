@@ -1,27 +1,23 @@
+
 // app/api/modifiers/route.ts
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+
+export const runtime = 'nodejs';
 
 export async function GET() {
   const list = await prisma.modifier.findMany({ orderBy: [{ name: 'asc' }] });
-  return Response.json(list);
+  return NextResponse.json(list);
 }
 
 export async function POST(req: Request) {
-  const { name, priceDelta, costDelta, stock, active } = await req.json();
-
-  if (!name || String(name).trim() === '') {
-    return Response.json({ error: 'Falta el nombre' }, { status: 400 });
+  try {
+    const body = await req.json();
+    const name = (body?.name ?? '').toString().trim();
+    if (!name) return NextResponse.json({ ok: false, error: 'Nombre requerido' }, { status: 400 });
+    const created = await prisma.modifier.create({ data: { name } });
+    return NextResponse.json({ ok: true, id: created.id });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err?.message || 'Error' }, { status: 500 });
   }
-
-  const data = {
-    name: String(name).trim(),
-    // En tu schema parecen ser number (no Decimal), así que usamos Number(...)
-    priceDelta: Number(priceDelta ?? 0),
-    costDelta: Number(costDelta ?? 0),
-    stock: Number(stock ?? 0),
-    active: active === undefined ? true : Boolean(active),
-  };
-
-  const m = await prisma.modifier.create({ data });
-  return Response.json(m, { status: 201 });
 }

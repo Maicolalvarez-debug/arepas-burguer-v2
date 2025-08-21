@@ -1,27 +1,46 @@
 
+// app/api/modifiers/[id]/route.ts
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const id = Number(params.id);
-  const body = await req.json();
-  if (!id) return Response.json({ error: 'ID inválido' }, { status: 400 });
-  const data:any = {};
-  if (body.name !== undefined) data.name = String(body.name).trim();
-  if (body.priceDelta !== undefined) data.priceDelta = Number(body.priceDelta);
-  if (body.costDelta !== undefined) data.costDelta = Number(body.costDelta);
-  if (body.stock !== undefined) data.stock = Number(body.stock);
-  if (body.active !== undefined) data.active = Boolean(body.active);
-  const updated = await prisma.modifier.update({ where: { id }, data });
-  return Response.json(updated);
+export const runtime = 'nodejs';
+
+function parseId(param: string) {
+  const id = Number(param);
+  if (!Number.isFinite(id) || id <= 0) throw new Error('ID inválido');
+  return id;
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  const id = Number(params.id);
-  if (!id) return Response.json({ error: 'ID inválido' }, { status: 400 });
+export async function GET(_: Request, ctx: { params: { id: string } }) {
   try {
+    const id = parseId(ctx.params.id);
+    const item = await prisma.modifier.findUnique({ where: { id } });
+    if (!item) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
+    return NextResponse.json(item);
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || 'Error' }, { status: 400 });
+  }
+}
+
+export async function PATCH(req: Request, ctx: { params: { id: string } }) {
+  try {
+    const id = parseId(ctx.params.id);
+    const body = await req.json();
+    const name = (body?.name ?? '').toString().trim();
+    if (!name) return NextResponse.json({ ok: false, error: 'Nombre requerido' }, { status: 400 });
+    await prisma.modifier.update({ where: { id }, data: { name } });
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err?.message || 'Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(_: Request, ctx: { params: { id: string } }) {
+  try {
+    const id = parseId(ctx.params.id);
     await prisma.modifier.delete({ where: { id } });
-    return Response.json({ ok: true });
-  } catch (e:any) {
-    return Response.json({ error: 'No se puede eliminar: modificador en uso' }, { status: 409 });
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    return NextResponse.json({ ok: false, error: err?.message || 'Error' }, { status: 500 });
   }
 }

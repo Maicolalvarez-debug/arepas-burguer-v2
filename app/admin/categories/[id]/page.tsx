@@ -1,10 +1,10 @@
 
-// app/admin/products/[id]/page.tsx
+// app/admin/categories/[id]/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function EditProductoPage({ params }: { params: { id: string } }) {
+export default function EditCategoríaPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const id = Number(params.id);
   const [name, setName] = useState('');
@@ -16,7 +16,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch('/api/products/' + id);
+        const res = await fetch('/api/categories/' + id);
         const json = await res.json();
         if (!res.ok || !json?.id) throw new Error('No encontrado');
         if (mounted) setName(json.name || '');
@@ -33,14 +33,14 @@ export default function EditProductoPage({ params }: { params: { id: string } })
     e.preventDefault();
     setMsg(null); setBusy(true);
     try {
-      const res = await fetch('/api/products/' + id, {
+      const res = await fetch('/api/categories/' + id, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
       const json = await res.json();
       if (!res.ok || !json?.ok) throw new Error(json?.error || 'No se pudo actualizar');
-      router.push('/admin/products');
+      router.push('/admin/categories');
     } catch (err: any) {
       setMsg(err?.message || 'Error');
     } finally {
@@ -52,7 +52,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
 
   return (
     <div className="p-4 max-w-md space-y-4">
-      <h1 className="text-xl font-semibold">Editar Producto</h1>
+      <h1 className="text-xl font-semibold">Editar Categoría</h1>
       <form onSubmit={submit} className="space-y-3">
         <div>
           <label className="block text-sm mb-1">Nombre</label>
