@@ -1,5 +1,0 @@
-'use client';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { categorySchema, CategoryInput } from '@/schemas/category';
-export default function CategoryForm({ onSubmit, defaultValues }:{ onSubmit:(d:CategoryInput)=>void|Promise<void>; defaultValues?: Partial<CategoryInput>;}){ const { register, handleSubmit, formState:{errors,isSubmitting}}=useForm<CategoryInput>({ resolver: zodResolver(categorySchema), defaultValues:{ name:'', ...(defaultValues as any)},}); return (<form onSubmit={handleSubmit(onSubmit)} className="space-y-3"><input placeholder="Nombre de categoría" {...register('name')}/>{errors.name && <p className="text-red-500 text-sm">{String(errors.name.message)}</p>}<button disabled={isSubmitting} type="submit">Guardar</button></form>);}
