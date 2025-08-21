@@ -38,6 +38,8 @@ model Product {
 
   @@index([categoryId])
   @@index([sortOrder])
+  orderItems   OrderItem[]
+
 }
 
 model Modifier {
@@ -52,6 +54,8 @@ model Modifier {
   products   ProductModifier[]
 
   @@index([sortOrder])
+  orderItemModifiers OrderItemModifier[]
+
 }
 
 model ProductModifier {
