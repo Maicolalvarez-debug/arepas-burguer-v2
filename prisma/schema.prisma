@@ -1,0 +1,65 @@
+
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  active      Boolean   @default(true)
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+  products    Product[]
+
+  @@index([sortOrder])
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  price       Float     @default(0)
+  cost        Float     @default(0)
+  stock       Int       @default(0)
+  active      Boolean   @default(true)
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+
+  modifiers   ProductModifier[]
+
+  @@index([categoryId])
+  @@index([sortOrder])
+}
+
+model Modifier {
+  id         Int       @id @default(autoincrement())
+  name       String
+  priceDelta Float     @default(0)
+  costDelta  Float     @default(0)
+  stock      Int       @default(0)
+  active     Boolean   @default(true)
+  sortOrder  Int       @default(0)
+
+  products   ProductModifier[]
+
+  @@index([sortOrder])
+}
+
+model ProductModifier {
+  productId  Int
+  modifierId Int
+
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  modifier   Modifier @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
+  @@id([productId, modifierId])
+}
