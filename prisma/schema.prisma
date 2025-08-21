@@ -1,0 +1,103 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]  sortOrder   Int       @default(0)
+}
+
+
+model Product {
+  id          Int              @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int
+  cost        Int
+  stock       Int
+  active      Boolean
+  imageUrl    String?
+  categoryId  Int
+  category    Category         @relation(fields: [categoryId], references: [id])
+  modifiers   ProductModifier[]  sortOrder   Int       @default(0)
+}
+
+
+model Modifier {
+  id         Int              @id @default(autoincrement())
+  name       String
+  priceDelta Int
+  costDelta  Int
+  stock      Int
+  active     Boolean
+  products   ProductModifier[]  sortOrder   Int       @default(0)
+}
+
+
+model ProductModifier {
+  productId  Int
+  modifierId Int
+  product    Product  @relation(fields: [productId], references: [id])
+  modifier   Modifier @relation(fields: [modifierId], references: [id])
+
+  @@id([productId, modifierId])  sortOrder   Int       @default(0)
+}
+
+
+
+model Order {
+  id        Int       @id @default(autoincrement())
+  tableCode String?
+  gross     Int
+  discount  Int       @default(0)
+  net       Int
+  cost      Int
+  printed   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id            Int       @id @default(autoincrement())
+  orderId       Int
+  productId     Int?
+  productName   String
+  quantity      Int       @default(1)
+  unitPrice     Int
+  unitCost      Int
+  subtotal      Int
+  subtotalCost  Int
+  order         Order     @relation(fields: [orderId], references: [id])
+  modifiers     OrderItemModifier[]
+}
+
+model OrderItemModifier {
+  id           Int       @id @default(autoincrement())
+  orderItemId  Int
+  modifierId   Int?
+  modifierName String
+  quantity     Int       @default(1)
+  priceDelta   Int
+  costDelta    Int
+  orderItem    OrderItem @relation(fields: [orderItemId], references: [id])
+}
+
+model DailyPromo {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  price       Int
+  cost        Int       @default(0)
+  imageUrl    String?
+  active      Boolean   @default(false)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+}
