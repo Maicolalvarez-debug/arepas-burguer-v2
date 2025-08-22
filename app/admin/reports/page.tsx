@@ -4,25 +4,13 @@ import { useMemo, useState } from 'react'
 import useSWR from 'swr'
 import dynamic from 'next/dynamic'
 
-const RC: any = dynamic(() => import('recharts').then(m => ({
-  ResponsiveContainer: m.ResponsiveContainer,
-  LineChart: m.LineChart,
-  Line: m.Line,
-  CartesianGrid: m.CartesianGrid,
-  XAxis: m.XAxis,
-  YAxis: m.YAxis,
-  Tooltip: m.Tooltip,
-  Legend: m.Legend,
-})), { ssr: false })
-
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
-
 const Chart = dynamic(() => import('./Chart'), { ssr: false })
 
 export default function ReportsPage() {
   const todayStr = new Date().toISOString().slice(0, 10)
-  const [from, setFrom] = useState(todayStr)
-  const [to, setTo] = useState(todayStr)
+  const [from, setFrom] = useState<string>(todayStr)
+  const [to, setTo] = useState<string>(todayStr)
   const [groupBy, setGroupBy] = useState<'day' | 'week' | 'month'>('day')
 
   const url = useMemo(() => `/api/reports?from=${from}&to=${to}&groupBy=${groupBy}`, [from, to, groupBy])
@@ -79,22 +67,6 @@ export default function ReportsPage() {
           </div>
 
           <Chart data={data?.series || []} />
-{/* Old container kept for reference removed by build script */}
-{/* <div className="w-full h-80 rounded-2xl border shadow p-2"> */}
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data?.series || []}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="gross" />
-                <Line type="monotone" dataKey="net" />
-                <Line type="monotone" dataKey="cost" />
-                <Line type="monotone" dataKey="profit" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
         </>
       )}
     </div>
