@@ -4,14 +4,18 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+function toNumber(v:any){ const n = Number(v ?? 0); return Number.isFinite(n) ? n : 0; }
+function toInt(v:any){ const n = parseInt(v ?? 0, 10); return Number.isFinite(n) ? n : 0; }
+function toBool(v:any){ if (typeof v === 'boolean') return v; const s = String(v ?? '').toLowerCase(); return s==='true' || s==='on' || s==='1'; }
+
 export async function GET() {
   try {
     try {
-      const list = await prisma.modifier.findMany({ orderBy: { sortOrder: 'asc' as any } as any });
-      return NextResponse.json(list);
+      const items = await prisma.modifier.findMany({ orderBy: { sortOrder: 'asc' } as any });
+      return NextResponse.json({ ok:true, items }, { status: 200 });
     } catch {
-      const list = await prisma.modifier.findMany({ orderBy: { name: 'asc' } });
-      return NextResponse.json(list);
+      const items = await prisma.modifier.findMany({ orderBy: { name: 'asc' } });
+      return NextResponse.json({ ok:true, items }, { status: 200 });
     }
   } catch (err:any) {
     return NextResponse.json({ ok:false, error: err?.message || 'Error' }, { status: 500 });
@@ -24,29 +28,19 @@ export async function POST(req: Request) {
     const name = String(body?.name ?? '').trim();
     if (!name) return NextResponse.json({ ok:false, error:'Nombre requerido' }, { status: 400 });
 
-    const toNumber = (v:any) => {
-      if (v === '' || v === null || v === undefined) return 0;
-      const n = Number(v);
-      return Number.isFinite(n) ? n : 0;
-    };
-    const toInt = (v:any) => Math.trunc(toNumber(v));
-    const toBool = (v:any) => {
-      if (typeof v === 'boolean') return v;
-      const s = String(v ?? '').toLowerCase();
-      return s === 'true' || s === '1' || s === 'on';
-    };
+    // Acepta price/cost desde el form como alias de priceDelta/costDelta
+    const priceDelta = toNumber(body?.priceDelta ?? body?.price);
+    const costDelta = toNumber(body?.costDelta ?? body?.cost);
+    const stock = toInt(body?.stock);
+    const active = toBool(body?.active);
 
-    const data:any = {
-      name,
-      priceDelta: toNumber(body?.priceDelta ?? body?.price),
-      costDelta: toNumber(body?.costDelta ?? body?.cost),
-      stock: toInt(body?.stock),
-      active: toBool(body?.active),
-    };
+    const created = await prisma.modifier.create({
+      data: { name, priceDelta, costDelta, stock, active },
+      select: { id: true }
+    });
 
-    const created = await prisma.modifier.create({ data });
     return NextResponse.json({ ok:true, id: created.id }, { status: 201 });
   } catch (err:any) {
-    return NextResponse.json({ ok:false, error: err?.message || 'Error' }, { status: 500 });
+    return NextResponse.json({ ok:false, error: err?.message || 'Error creando modificador' }, { status: 500 });
   }
 }
