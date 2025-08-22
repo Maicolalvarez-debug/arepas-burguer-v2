@@ -44,15 +44,15 @@ const [to,setTo] = useState<string>(last7()[1])
       <div className="grid sm:grid-cols-6 gap-3 items-end">
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Desde</span>
-          <input className="border rounded px-2 py-1" type="date" value={from} onChange={e=>setFrom(e.target.value)} />
+          <input className="border border-gray-700 text-white rounded px-2 py-1" type="date" value={from} onChange={e=>setFrom(e.target.value)} />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Hasta</span>
-          <input className="border rounded px-2 py-1" type="date" value={to} onChange={e=>setTo(e.target.value)} />
+          <input className="border border-gray-700 text-white rounded px-2 py-1" type="date" value={to} onChange={e=>setTo(e.target.value)} />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Estado</span>
-          <select className="border rounded px-2 py-1" value={printed} onChange={e=>setPrinted(e.target.value as any)}>
+          <select className="border border-gray-700 text-white rounded px-2 py-1" value={printed} onChange={e=>setPrinted(e.target.value as any)}>
             <option value="all">Todos</option>
             <option value="true">Impresos</option>
             <option value="false">No impresos</option>
@@ -62,7 +62,7 @@ const [to,setTo] = useState<string>(last7()[1])
 
       <div className="space-y-3">
         {(data||[]).map((o:any)=>(
-          <div key={o.id} className="border rounded-xl p-3 shadow">
+          <div key={o.id} className="border border-gray-700 text-white rounded-xl p-3 shadow">
             <div className="flex justify-between items-center">
               <div className="font-medium">#{o.id} — {new Date(o.createdAt).toLocaleString()}</div>
               <div className="text-sm opacity-70">{o.tableCode || 'Mostrador'}</div>
@@ -70,11 +70,11 @@ const [to,setTo] = useState<string>(last7()[1])
             <div className="text-sm">Bruto: {pesos(o.gross)} · Descuento: {pesos(o.discount)} · Neto: <b>{pesos(o.net)}</b></div>
             <div className="text-xs opacity-70">Costo: {pesos(o.cost)}</div>
             <div className="flex gap-2 items-center mt-2">
-              <button className="border px-3 py-1 rounded" onClick={()=>setDiscount(o.id, o.discount)}>Descuento</button>
-              <Link className="border px-3 py-1 rounded" href={`/admin/receipts/${o.id}/print`} target="_blank">Imprimir comanda</Link>
+              <button className="border border-gray-700 text-white px-3 py-1 rounded" onClick={()=>setDiscount(o.id, o.discount)}>Descuento</button>
+              <Link className="border border-gray-700 text-white px-3 py-1 rounded" href={`/admin/receipts/${o.id}/print`} target="_blank">Imprimir comanda</Link>
               {o.printed
-                ? <button className="border px-3 py-1 rounded" onClick={()=>markPrinted(o.id,false)}>Marcar como NO impresa</button>
-                : <button className="border px-3 py-1 rounded bg-black text-white" onClick={()=>markPrinted(o.id,true)}>Marcar como impresa</button>}
+                ? <button className="border border-gray-700 text-white px-3 py-1 rounded" onClick={()=>markPrinted(o.id,false)}>Marcar como NO impresa</button>
+                : <button className="border border-gray-700 text-white px-3 py-1 rounded bg-black text-white" onClick={()=>markPrinted(o.id,true)}>Marcar como impresa</button>}
             </div>
           </div>
         ))}

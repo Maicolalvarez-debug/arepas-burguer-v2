@@ -24,15 +24,15 @@ export default function ReportsPage(){
       <div className="grid sm:grid-cols-6 gap-3 items-end">
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Desde</span>
-          <input className="border rounded px-2 py-1" type="date" value={from} onChange={e=>setFrom(e.target.value)} />
+          <input className="border border-gray-700 text-white rounded px-2 py-1" type="date" value={from} onChange={e=>setFrom(e.target.value)} />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Hasta</span>
-          <input className="border rounded px-2 py-1" type="date" value={to} onChange={e=>setTo(e.target.value)} />
+          <input className="border border-gray-700 text-white rounded px-2 py-1" type="date" value={to} onChange={e=>setTo(e.target.value)} />
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Agrupar por</span>
-          <select className="border rounded px-2 py-1" value={groupBy} onChange={e=>setGroupBy(e.target.value as any)}>
+          <select className="border border-gray-700 text-white rounded px-2 py-1" value={groupBy} onChange={e=>setGroupBy(e.target.value as any)}>
             <option value="day">Día</option>
             <option value="week">Semana</option>
             <option value="month">Mes</option>
@@ -57,7 +57,7 @@ export default function ReportsPage(){
               { label:'Costo',    value: data?.totals?.cost  || 0 },
               { label:'Utilidad', value: data?.totals?.profit|| 0 },
             ].map(c=>(
-              <div key={c.label} className="rounded-2xl p-4 shadow border bg-white/5">
+              <div key={c.label} className="rounded-2xl p-4 shadow border bg-gray-900 border-gray-700 text-white">
                 <div className="text-xs opacity-70">{c.label}</div>
                 <div className="text-xl font-semibold">${(c.value as number).toLocaleString()}</div>
               </div>

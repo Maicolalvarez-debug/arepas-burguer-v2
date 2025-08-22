@@ -57,7 +57,7 @@ export default function AdminProducts() {
         <button onClick={()=>setStatus('active')} className={`px-3 py-1 rounded border ${status==='active'?'bg-black text-white':''}`}>Activos</button>
         <button onClick={()=>setStatus('archived')} className={`px-3 py-1 rounded border ${status==='archived'?'bg-black text-white':''}`}>Archivados</button>
         <button onClick={()=>setStatus('all')} className={`px-3 py-1 rounded border ${status==='all'?'bg-black text-white':''}`}>Todos</button>
-        <input className="ml-4 border rounded px-3 py-1" placeholder="Buscar..." value={q} onChange={e=>setQ(e.target.value)} />
+        <input className="ml-4 border rounded px-3 py-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400" placeholder="Buscar..." value={q} onChange={e=>setQ(e.target.value)} />
       </div>
 
       {isLoading && <div>Cargando…</div>}
@@ -78,19 +78,19 @@ export default function AdminProducts() {
             <tbody>
               {(data||[]).map((p:any)=>(
                 <tr key={p.id} className="border-t">
-                  <td className="p-2 border">{p.id}</td>
-                  <td className="p-2 border">{p.name}</td>
-                  <td className="p-2 border">{p.categoryId}</td>
-                  <td className="p-2 border text-right">{pesos(p.price)}</td>
-                  <td className="p-2 border text-right">{pesos(p.cost)}</td>
-                  <td className="p-2 border text-center">{p.isActive ? 'Activo' : 'Archivado'}</td>
-                  <td className="p-2 border text-center">
+                  <td className="p-2 border border-gray-700 text-white">{p.id}</td>
+                  <td className="p-2 border border-gray-700 text-white">{p.name}</td>
+                  <td className="p-2 border border-gray-700 text-white">{p.categoryId}</td>
+                  <td className="p-2 border border-gray-700 text-white text-right">{pesos(p.price)}</td>
+                  <td className="p-2 border border-gray-700 text-white text-right">{pesos(p.cost)}</td>
+                  <td className="p-2 border border-gray-700 text-white text-center">{p.isActive ? 'Activo' : 'Archivado'}</td>
+                  <td className="p-2 border border-gray-700 text-white text-center">
                     <div className="flex gap-2 justify-center">
-                      <button className="border rounded px-2 py-1" onClick={()=>quickEditPrice(p.id, p.price)}>Precio</button>
-                      <button className="border rounded px-2 py-1" onClick={()=>quickEditCost(p.id, p.cost)}>Costo</button>
+                      <button className="border border-gray-700 text-white rounded px-2 py-1" onClick={()=>quickEditPrice(p.id, p.price)}>Precio</button>
+                      <button className="border border-gray-700 text-white rounded px-2 py-1" onClick={()=>quickEditCost(p.id, p.cost)}>Costo</button>
                       {p.isActive
-                        ? <button className="border rounded px-2 py-1" onClick={()=>archive(p.id)}>Archivar</button>
-                        : <button className="border rounded px-2 py-1 bg-black text-white" onClick={()=>restore(p.id)}>Restaurar</button>
+                        ? <button className="border border-gray-700 text-white rounded px-2 py-1" onClick={()=>archive(p.id)}>Archivar</button>
+                        : <button className="border border-gray-700 text-white rounded px-2 py-1 bg-black text-white" onClick={()=>restore(p.id)}>Restaurar</button>
                       }
                     </div>
                   </td>

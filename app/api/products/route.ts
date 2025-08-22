@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   if (q) where.name = { contains: q, mode: 'insensitive' }
   if (categoryId) where.categoryId = Number(categoryId)
 
-  const products = await prisma.product.findMany({
+  let products = await prisma.product.findMany({
     where,
     orderBy: [{ categoryId: 'asc' }, { name: 'asc' }],
   })
