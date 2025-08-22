@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import { adminFetchList } from '@/helpers/adminFetchList';
-
 export const revalidate = 0;
-
 export default async function ProductsAdmin() {
   const products = await adminFetchList('/api/products');
   return (

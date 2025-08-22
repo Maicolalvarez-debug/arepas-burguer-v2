@@ -1,4 +1,3 @@
-// GET/POST orders
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { toInt, toNumber } from '@/lib/parsers';
@@ -10,8 +9,8 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const includeItems = url.searchParams.get('include') === 'items';
     const orders = await prisma.order.findMany({
-      orderBy: { id: 'desc' },
-      take: 100,
+      orderBy: { id: 'asc' },
+      take: 200,
       include: includeItems ? { items: { include: { product: true, modifiers: { include: { modifier: true } } } } } : undefined
     });
     return NextResponse.json(Array.isArray(orders) ? orders : []);
@@ -23,7 +22,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({} as any));
-    // Expect items: [{ productId, qty, price, cost, net, modifiers?: [{ modifierId, priceDelta, costDelta }] }]
     const tableCode = body?.tableCode ? String(body.tableCode) : null;
     const items = Array.isArray(body?.items) ? body.items : [];
 

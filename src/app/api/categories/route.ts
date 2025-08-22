@@ -1,4 +1,3 @@
-// GET/POST categories
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { toBool } from '@/lib/parsers';

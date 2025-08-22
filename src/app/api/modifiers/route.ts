@@ -1,4 +1,3 @@
-// GET/POST modifiers
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { toNumber, toInt, toBool } from '@/lib/parsers';
@@ -19,7 +18,6 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({} as any));
-
     const name = String(body?.name ?? '').trim();
     if (!name) return NextResponse.json({ ok:false, error:'Nombre requerido' }, { status: 400 });
 
