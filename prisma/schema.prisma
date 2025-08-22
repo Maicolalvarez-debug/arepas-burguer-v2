@@ -42,6 +42,7 @@ model Modifier {
   active     Boolean   @default(true)
   sortOrder  Int?
   products   ProductModifier[]
+  orderItemModifiers  OrderItemModifier[]
 }
 
 model ProductModifier {
