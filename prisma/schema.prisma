@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  description String?
+  image      String?
+  active     Boolean   @default(true)
+  sortOrder  Int?
+  products   Product[]
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  image       String?
+  price       Int
+  cost        Int
+  stock       Int        @default(0)
+  active      Boolean    @default(true)
+  sortOrder   Int?
+  categoryId  Int?
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  modifiers   ProductModifier[]
+  orderItems  OrderItem[]
+}
+
+model Modifier {
+  id         Int       @id @default(autoincrement())
+  name       String
+  priceDelta Int       @default(0)
+  costDelta  Int       @default(0)
+  stock      Int       @default(0)
+  active     Boolean   @default(true)
+  sortOrder  Int?
+  products   ProductModifier[]
+}
+
+model ProductModifier {
+  productId  Int
+  modifierId Int
+  product    Product  @relation(fields: [productId], references: [id])
+  modifier   Modifier @relation(fields: [modifierId], references: [id])
+
+  @@id([productId, modifierId])
+}
+
+model Order {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  tableCode  String?
+  gross      Int
+  discount   Int        @default(0)
+  net        Int
+  cost       Int
+  profit     Int
+  printed    Boolean    @default(false)
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id         Int        @id @default(autoincrement())
+  orderId    Int
+  productId  Int
+  qty        Int
+  price      Int
+  cost       Int
+  net        Int
+  order      Order      @relation(fields: [orderId], references: [id])
+  product    Product    @relation(fields: [productId], references: [id])
+  modifiers  OrderItemModifier[]
+}
+
+model OrderItemModifier {
+  orderItemId Int
+  modifierId  Int
+  priceDelta  Int
+  costDelta   Int
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+  modifier    Modifier  @relation(fields: [modifierId], references: [id])
+
+  @@id([orderItemId, modifierId])
+}
