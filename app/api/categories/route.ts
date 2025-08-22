@@ -1,9 +1,7 @@
-// app/api/categories/route.ts
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
-
 const toBool = (v: any) => {
   if (typeof v === 'boolean') return v;
   const s = String(v ?? '').toLowerCase();

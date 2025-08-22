@@ -1,9 +1,7 @@
-// app/api/products/route.ts
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
-
 const toNumber = (v: any, d = 0) => {
   const n = Number(v);
   return Number.isFinite(n) ? n : d;
