@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   if (from) (where.createdAt as any).gte = new Date(from as string + 'T00:00:00.000');
   if (to)   (where.createdAt as any).lte = new Date(to as string   + 'T23:59:59.999');
   const orders = await prisma.order.findMany({ where, orderBy: { createdAt: 'desc' } });
-  return NextResponse.json(orders, { headers: { 'Cache-Control': 'no-store' } });
+  return NextResponse.json(orders, { headers: { 'Cache-Control': 'no-store' } }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
 type BodyItem = { productId: number; quantity: number; modifiers?: { modifierId: number; quantity?: number }[] }
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const tableCode = b.tableCode || null;
   const discount = Number(b.discount || 0);
   const items: BodyItem[] = Array.isArray(b.items) ? b.items : [];
-  if (!items.length) return NextResponse.json({ error: 'items required' }, { status: 400 }, { headers: { 'Cache-Control': 'no-store' } });
+  if (!items.length) return NextResponse.json({ error: 'items required' }, { status: 400, headers: {  'Cache-Control': 'no-store'  } }, { headers: { 'Cache-Control': 'no-store' } });
 
   // Collect product and modifier ids
   const productIds = Array.from(new Set(items.map(i => Number(i.productId)).filter(Boolean)));
@@ -77,5 +77,5 @@ export async function POST(req: NextRequest) {
   const order = await prisma.order.create({
     data: { tableCode, discount, gross, net, cost: totalCost, printed: false, items: { create: orderItemsData } }
   });
-  return NextResponse.json({ ok: true, id: order.id }, { status: 201 }, { headers: { 'Cache-Control': 'no-store' } });
+  return NextResponse.json({ ok: true, id: order.id }, { status: 201 }, { headers: { 'Cache-Control': 'no-store' } }, { headers: { 'Cache-Control': 'no-store' } });
 }
