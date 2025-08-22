@@ -2,15 +2,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
-    // Intentar ordenar por sortOrder si existe; si no, por name
     try {
-      const rows = await prisma.modifier.findMany({ orderBy: { sortOrder: 'asc' } as any });
-      if (rows && rows.length) return NextResponse.json(rows);
-    } catch {}
-    const rows = await prisma.modifier.findMany({ orderBy: { name: 'asc' } });
-    return NextResponse.json(rows);
+      const list = await prisma.modifier.findMany({ orderBy: { sortOrder: 'asc' as any } as any });
+      return NextResponse.json(list);
+    } catch {
+      const list = await prisma.modifier.findMany({ orderBy: { name: 'asc' } });
+      return NextResponse.json(list);
+    }
   } catch (err:any) {
     return NextResponse.json({ ok:false, error: err?.message || 'Error' }, { status: 500 });
   }
@@ -19,18 +21,30 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({} as any));
-    const name = String(body?.name || '').trim();
-    if (!name) return NextResponse.json({ ok:false, error: 'Nombre requerido' }, { status: 400 });
+    const name = String(body?.name ?? '').trim();
+    if (!name) return NextResponse.json({ ok:false, error:'Nombre requerido' }, { status: 400 });
 
-    const priceDelta = Number(body?.priceDelta ?? body?.price ?? 0) || 0;
-    const costDelta  = Number(body?.costDelta  ?? body?.cost  ?? 0) || 0;
-    const stock      = Math.max(0, parseInt(String(body?.stock ?? 0), 10) || 0);
-    const active     = typeof body?.active === 'boolean' ? body.active : String(body?.active).toLowerCase() === 'true';
+    const toNumber = (v:any) => {
+      if (v === '' || v === null || v === undefined) return 0;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    };
+    const toInt = (v:any) => Math.trunc(toNumber(v));
+    const toBool = (v:any) => {
+      if (typeof v === 'boolean') return v;
+      const s = String(v ?? '').toLowerCase();
+      return s === 'true' || s === '1' || s === 'on';
+    };
 
-    const created = await prisma.modifier.create({
-      data: { name, priceDelta, costDelta, stock, active }
-    });
+    const data:any = {
+      name,
+      priceDelta: toNumber(body?.priceDelta ?? body?.price),
+      costDelta: toNumber(body?.costDelta ?? body?.cost),
+      stock: toInt(body?.stock),
+      active: toBool(body?.active),
+    };
 
+    const created = await prisma.modifier.create({ data });
     return NextResponse.json({ ok:true, id: created.id }, { status: 201 });
   } catch (err:any) {
     return NextResponse.json({ ok:false, error: err?.message || 'Error' }, { status: 500 });
