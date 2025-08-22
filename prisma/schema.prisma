@@ -58,11 +58,11 @@ model Order {
   id         Int        @id @default(autoincrement())
   createdAt  DateTime   @default(now())
   tableCode  String?
-  gross      Int
+  gross      Int @default(0)
   discount   Int        @default(0)
-  net        Int
-  cost       Int
-  profit     Int
+  net        Int @default(0)
+  cost       Int @default(0)
+  profit     Int @default(0)
   printed    Boolean    @default(false)
   items      OrderItem[]
 }
@@ -71,10 +71,10 @@ model OrderItem {
   id         Int        @id @default(autoincrement())
   orderId    Int
   productId  Int
-  qty        Int
-  price      Int
-  cost       Int
-  net        Int
+  qty        Int @default(0)
+  price      Int @default(0)
+  cost       Int @default(0)
+  net        Int @default(0)
   order      Order      @relation(fields: [orderId], references: [id])
   product    Product    @relation(fields: [productId], references: [id])
   modifiers  OrderItemModifier[]
