@@ -8,9 +8,12 @@ const pesos = (n:number)=>'$'+(n||0).toLocaleString('es-CO')
 const fmt = (d:Date)=>d.toISOString().slice(0,10)
 
 export default function Receipts(){
-  const today = fmt(new Date())
-  const [from,setFrom] = useState<string>(today)
-  const [to,setTo]     = useState<string>(today)
+  const toISO = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0,10)
+const startOfWeek = (d: Date) => { const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x }
+const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1)
+const last7 = () => { const end = new Date(); const start = new Date(); start.setDate(end.getDate()-6); return [toISO(start), toISO(end)] as const }
+const [from,setFrom] = useState<string>(last7()[0])
+const [to,setTo] = useState<string>(last7()[1])
   const [printed,setPrinted] = useState<'all'|'true'|'false'>('all')
 
   const qs = useMemo(()=>{
