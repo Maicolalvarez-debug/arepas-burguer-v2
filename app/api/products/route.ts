@@ -1,41 +1,21 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
-// app/api/products/route.ts
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const status = (searchParams.get('status') || 'active') as 'active' | 'archived' | 'all'
+  const q = (searchParams.get('q') || '').trim()
+  const categoryId = searchParams.get('categoryId')
 
-export const runtime = 'nodejs';
+  const where: any = {}
+  if (status === 'active') where.isActive = true
+  if (status === 'archived') where.isActive = false
+  if (q) where.name = { contains: q, mode: 'insensitive' }
+  if (categoryId) where.categoryId = Number(categoryId)
 
-export async function GET() {
-  const list = await prisma.product.findMany({ orderBy: [{ name: 'asc' }] });
-  return NextResponse.json(list);
+  const products = await prisma.product.findMany({
+    where,
+    orderBy: [{ categoryId: 'asc' }, { name: 'asc' }],
+  })
+  return NextResponse.json(products)
 }
-
-export async function POST(req: Request) {
-      try {
-        const body = await req.json();
-        const name = (body?.name ?? '').toString().trim();
-        if (!name) return NextResponse.json({ ok: false, error: 'Nombre requerido' }, { status: 400 });
-
-        // Campos comunes en Product
-        const price       = Number(body?.price ?? 0);
-        const cost        = Number(body?.cost ?? 0);
-        const stock       = Number(body?.stock ?? 0);
-        const active      = Boolean(body?.active ?? true);
-        const categoryId  = body?.categoryId != null ? Number(body.categoryId) : null;
-        const description = (body?.description ?? '').toString();
-        const image       = (body?.image ?? '').toString();
-
-        const created = await prisma.product.create({
-          data: {
-            name, price, cost, stock, active,
-            categoryId: Number.isFinite(categoryId) ? categoryId : null,
-            description,
-            image,
-          } as any,
-        });
-        return NextResponse.json({ ok: true, id: created.id });
-      } catch (err: any) {
-        return NextResponse.json({ ok: false, error: err?.message || 'Error' }, { status: 500 });
-      }
-    }
-
