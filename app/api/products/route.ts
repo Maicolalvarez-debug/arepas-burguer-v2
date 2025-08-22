@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
@@ -17,5 +18,5 @@ export async function GET(req: NextRequest) {
     where,
     orderBy: [{ categoryId: 'asc' }, { name: 'asc' }],
   })
-  return NextResponse.json(products)
+  return NextResponse.json(products, { headers: { 'Cache-Control': 'no-store' } })
 }
