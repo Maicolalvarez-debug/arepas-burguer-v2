@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     const active = toBool(body?.active);
 
     const created = await prisma.modifier.create({
-      data: { name, price, cost, stock, active },
+      data: { name, priceDelta: price, costDelta: cost, stock, active },
       select: { id: true },
     });
 
