@@ -1,0 +1,140 @@
+
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  active      Boolean   @default(true)
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+  products    Product[]
+
+  @@index([sortOrder])
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  price       Float     @default(0)
+  cost        Float     @default(0)
+  stock       Int       @default(0)
+  active      Boolean   @default(true)
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+
+  modifiers   ProductModifier[]
+
+  @@index([categoryId])
+  @@index([sortOrder])
+  orderItems   OrderItem[]
+
+}
+
+model Modifier {
+  id         Int       @id @default(autoincrement())
+  name       String
+  priceDelta Float     @default(0)
+  costDelta  Float     @default(0)
+  stock      Int       @default(0)
+  active     Boolean   @default(true)
+  sortOrder  Int       @default(0)
+
+  products   ProductModifier[]
+
+  @@index([sortOrder])
+  orderItemModifiers OrderItemModifier[]
+
+}
+
+model ProductModifier {
+  productId  Int
+  modifierId Int
+
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  modifier   Modifier @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
+  @@id([productId, modifierId])
+}
+
+
+model Order {
+  items     OrderItem[]
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  tableCode String?
+  gross     Float    @default(0)
+  discount  Float    @default(0)
+  net       Float    @default(0)
+  cost      Float    @default(0)
+  profit    Float    @default(0)
+  printed   Boolean  @default(false)
+
+  @@index([createdAt])
+}
+
+
+model OrderItem {
+  id         Int       @id @default(autoincrement())
+  orderId    Int
+  productId  Int?
+  name       String
+  qty        Int       @default(1)
+  unitPrice  Float     @default(0)
+  unitCost   Float     @default(0)
+  lineGross  Float     @default(0)
+  lineCost   Float     @default(0)
+  lineNet    Float     @default(0)
+
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  modifiers  OrderItemModifier[]
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderItemModifier {
+  orderItemId Int
+  modifierId  Int
+  qty         Int     @default(1)
+  priceDelta  Float   @default(0)
+  costDelta   Float   @default(0)
+
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  modifier    Modifier  @relation(fields: [modifierId], references: [id], onDelete: Cascade)
+
+  @@id([orderItemId, modifierId])
+}
+
+
+model DailyPromo {
+  id          Int       @id @default(autoincrement())
+  active      Boolean   @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  title       String?
+  description String?
+  image       String?
+  imageUrl    String?
+  price       Float     @default(0)
+  cost        Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([active])
+  @@index([startDate])
+  @@index([endDate])
+}
