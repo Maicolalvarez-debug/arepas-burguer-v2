@@ -20,14 +20,15 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => ({} as any));
+    const body = await req.json()
+    const image = (image ?? imageUrl ?? '')?.toString().trim() || null;.catch(() => ({} as any));
     const name = String(body?.name ?? '').trim();
     if (!name) return NextResponse.json({ ok:false, error:'Nombre requerido' }, { status: 400 });
 
     const data:any = {
       name,
       description: body?.description ? String(body.description) : null,
-      imageUrl: body?.imageUrl ? String(body.imageUrl) : null,
+      image: image ? String(body.image) : null,
       active: typeof body?.active === 'boolean' ? body.active : String(body?.active ?? '') === 'true'
     };
 
