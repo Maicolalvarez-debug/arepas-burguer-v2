@@ -32,7 +32,7 @@ export default function ReportsPage(){
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Agrupar por</span>
-          <select className="border border-gray-700 text-white rounded px-2 py-1" value={groupBy} onChange={e=>setGroupBy(e.target.value as any)}>
+          <select className="border border-gray-700 text-white rounded px-2 py-1 bg-gray-800 border-gray-700 text-white" value={groupBy} onChange={e=>setGroupBy(e.target.value as any)}>
             <option value="day">Día</option>
             <option value="week">Semana</option>
             <option value="month">Mes</option>

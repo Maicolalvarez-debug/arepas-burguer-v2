@@ -9,7 +9,7 @@ const pesos = (n:number)=>'$'+(n||0).toLocaleString('es-CO')
 type Status = 'active'|'archived'|'all'
 
 export default function AdminProducts() {
-  const [status, setStatus] = useState<Status>('active')
+  const [status, setStatus] = useState<Status>('all')
   const [q, setQ] = useState('')
 
   const url = useMemo(()=>{

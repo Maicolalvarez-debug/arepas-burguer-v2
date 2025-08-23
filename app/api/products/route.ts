@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const status = ((searchParams.get('status') || 'active') as 'active'|'archived'|'all')
+  const status = ((searchParams.get('status') || 'all') as 'active'|'archived'|'all')
   const q = (searchParams.get('q') || '').trim()
   const categoryId = searchParams.get('categoryId')
 

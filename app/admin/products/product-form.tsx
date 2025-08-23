@@ -44,7 +44,7 @@ export default function ProductForm({ id }:{ id?: number }){
         <div><label className="label">Stock</label><input className="input" type="text" inputMode="decimal" value={state.stock ?? ''} onChange={e=>setState({...state, stock:Number(e.target.value)})}/></div>
       </div>
       <div><label className="label">Categoría</label>
-        <select className="input" value={state.categoryId||''} onChange={e=>setState({...state, categoryId: e.target.value? Number(e.target.value): null})}>
+        <select className="input bg-gray-800 border-gray-700 text-white" value={state.categoryId||''} onChange={e=>setState({...state, categoryId: e.target.value? Number(e.target.value): null})}>
           <option value="">Sin categoría</option>{(cats||[]).map((c:any)=> <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </div>

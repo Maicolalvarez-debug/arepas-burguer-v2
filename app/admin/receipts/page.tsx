@@ -52,7 +52,7 @@ const [to,setTo] = useState<string>(last7()[1])
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-xs opacity-70 font-medium">Estado</span>
-          <select className="border border-gray-700 text-white rounded px-2 py-1" value={printed} onChange={e=>setPrinted(e.target.value as any)}>
+          <select className="border border-gray-700 text-white rounded px-2 py-1 bg-gray-800 border-gray-700 text-white" value={printed} onChange={e=>setPrinted(e.target.value as any)}>
             <option value="all">Todos</option>
             <option value="true">Impresos</option>
             <option value="false">No impresos</option>
