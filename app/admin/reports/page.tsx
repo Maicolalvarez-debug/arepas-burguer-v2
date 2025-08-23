@@ -39,7 +39,7 @@ export default function ReportsPage(){
           </select>
         </div>
         <div className="sm:col-span-3 flex gap-2 justify-end">
-          <a className="inline-flex items-center border rounded px-3 py-1 text-sm" href={`/api/reports.csv?from=${from}&to=${to}&groupBy=${groupBy}`}>
+          <a className="inline-flex items-center border rounded px-3 py-1 text-sm bg-gray-900 text-white border-gray-700 hover:bg-gray-800" href={`/api/reports.csv?from=${from}&to=${to}&groupBy=${groupBy}`}>
             Descargar CSV
           </a>
         </div>
